@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Android/MyApp/app/src/main/res/layout/activity_variedades_cereza.xml" value="0.259375" />
+        <entry key="..\:/Android/MyApp/app/src/main/res/layout/fragment_variedades_cereza.xml" value="0.25" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/drawable-v24/ic_edit_24.xml" value="0.1" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/drawable-v24/ic_white_add_circle_24.xml" value="0.1" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/detalle_rv_card.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/empacador_rv_card.xml" value="1.1829573934837092" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_detalle.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_empacador.xml" value="0.4010195412064571" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_empacar.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_empresas.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_modificar_detalle.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_produccion__buscar__pesa.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/menu/menu_detalle.xml" value="0.20416666666666666" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

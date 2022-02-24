@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    tools:context=".Produccion.fragmentos.FProduccion">
+
+    <LinearLayout
+        android:id="@+id/linear_produccion"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/linear_primeralinea"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tel" />
+
+            <EditText
+                android:id="@+id/edt_telefono"
+                android:orientation="horizontal"
+                android:gravity="left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="   " />
+
+            <RadioGroup
+                android:id="@+id/radio_cuartel"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:orientation="horizontal"
+                    android:gravity="left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cuartel:" />
+
+                <RadioButton
+                    android:id="@+id/radio_btn_cuartel_01"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="01"/>
+                <RadioButton
+                    android:id="@+id/radio_btn_cuartel_02"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="02"/>
+                <RadioButton
+                    android:id="@+id/radio_btn_cuartel_03"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="03"/>
+            </RadioGroup>
+        </LinearLayout>
+
+        <Button
+        android:id="@+id/btn_ActivarCamara"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Leer codigo de barra" />
+
+        <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+            <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Operario" />
+
+            <EditText
+                android:id="@+id/edt_Operario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="15dp"
+                android:textColor="@color/blue"
+                android:maxLines="1"
+                android:lines="1"/>
+            <TextView
+                android:layout_marginTop="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Producto" />
+
+            <EditText
+                android:id="@+id/edt_Producto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="4"
+                android:lines="4"
+                android:inputType="text" />
+
+            <TextView
+                android:layout_marginTop="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Variedad" />
+
+            <EditText
+                android:id="@+id/edt_Variedad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="4"
+                android:lines="4"
+                android:inputType="text" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="20dp"
+                    android:textStyle="bold"
+                    android:text="Cantidad"></TextView>
+
+                <TextView
+                    android:id="@+id/btn_Restar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:height="35dp"
+                    android:background="#E2AB5A"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="-"
+                    android:textSize="30dp"></TextView>
+
+                <EditText
+                    android:id="@+id/edt_Cantidad"
+                    android:selectAllOnFocus="true"
+                    android:layout_width="120dp"
+                    android:layout_height="55dp"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="right"
+                    android:hint="0.00"
+                    android:inputType="text"></EditText>
+
+                <TextView
+                    android:id="@+id/btn_Sumar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:height="35dp"
+                    android:background="#009688"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="+"
+                    android:textSize="30dp"></TextView>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_Capturar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Capturar" />
+
+            <Button
+                android:id="@+id/btn_Buscar_Pesa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Buscar Pesa" />
+
+            <Button
+                android:id="@+id/btn_Volver"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Volver" />
+
+             </LinearLayout>
+
+       </ScrollView>
+
+    </LinearLayout>
+
+</FrameLayout>
