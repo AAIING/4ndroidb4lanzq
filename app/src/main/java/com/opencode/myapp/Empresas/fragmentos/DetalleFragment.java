@@ -92,6 +92,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -117,7 +118,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothAdapter myBluetooth = null;
     private BluetoothSocket btSocket = null;
-    public boolean syncpesa, actpesa, isOk = false, isOkPedido = false,  isBtConnected = false, fragil=false;
+    public boolean syncpesa, actpesa, isOk = false, isOkPedido = false,  isBtConnected = false, fragil=false,balanzaB=false;
     private double pesajeFin=0, pesotope=0, montototal=0;
     private int listPos =0,  registro =0, idsesionempaque =0, cajas=0, bolsas=0, cantcomanda=0;
 
@@ -506,7 +507,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 public void onClick(DialogInterface dialog, int which) {
                     /***/
                     alertDialog.dismiss();
-                    handler.removeCallbacks(runnable);
 
                     /**ANULAR PRODUCTO EN PEDIDOD*/
                     for(Pedidosd item_pedidod: listDetalle) {
@@ -547,6 +547,16 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             montototal,
                             pesototal);
 
+                    handler.removeCallbacks(runnable);
+
+                    if(btSocket != null) {
+                        try {
+                            btSocket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     EmpacadorFragment newFragment = new EmpacadorFragment();
                     FragmentTransaction fm = getActivity().getSupportFragmentManager().beginTransaction();
                     fm.replace(R.id.frame_empresas, newFragment);
@@ -581,7 +591,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     //
-                    handler.removeCallbacks(runnable);
+                    //handler.removeCallbacks(runnable);
                     /**ELIMINA SESION SIN GUARDAR/FINALIZAR*/
                     getSesionEmpaque(Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idOperario)),
                             0,
@@ -614,9 +624,9 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             @Override
             public void onEditar(View view, final int position) {
                 //
-                Pedidosd item = listDetalle.get(position);
+                final Pedidosd item = listDetalle.get(position);
                 Productos item_prod = item.getProductos();
-                PresentacionesHasProductos item_preshasprod = item.getPreshasprod();
+                final PresentacionesHasProductos item_preshasprod = item.getPreshasprod();
 
                 handler.removeCallbacks(runnable);
 
@@ -781,7 +791,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
 
 
     /**FINALIZAR TURNO*/
-    private void getSesionEmpaque(int idusuario, int idpedido, int idsesionempaque, int status, String tiempoempaque){
+    private void getSesionEmpaque(int idusuario, int idpedido, int idsesionempaque, final int status, String tiempoempaque){
 
         Call<Sesiones> call = ApiConf.getData().getSesionEmpaque(0,idusuario, idpedido, idsesionempaque, status, tiempoempaque);
         call.enqueue(new Callback<Sesiones>() {
@@ -794,6 +804,8 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     FragmentTransaction fm = getActivity().getSupportFragmentManager().beginTransaction();
                     fm.replace(R.id.frame_empresas, newFragment);
                     fm.commit();
+
+                    handler.removeCallbacks(runnable);
 
                     if(btSocket != null) {
                         try {
@@ -902,11 +914,34 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
         // Keep looping to listen for received messages
         while (syncpesa) {
 
-
-
             try {
                 bytes = socketInputStream.read(buffer); //read bytes from input buffer
-                readMessage = new String(buffer, 0, bytes);
+                String readMess = new String(buffer, 0, bytes);
+
+                String[] parts = readMess.split(Pattern.quote("+"));
+                if(parts.length > 1) {
+                    String pesopart = parts[1];
+                    //balanzaB = true;
+
+                    //String[] part = readMess.split(Pattern.quote("+"));
+                    //String pesop = part[1];
+
+                    String[] parts2 = pesopart.split("kg\r\n");
+                    String pesopart2 = parts2[0];
+                    Log.e("DATOSPESA--->", pesopart2 + "");
+                    readMessage = pesopart2;
+                }else{
+                    readMessage = readMess;
+                }
+
+                // if(readMess.equals("ST,GS,+   0.00kg\r\n"))
+                //}
+
+                //if(balanzaB){
+
+                //}else{
+
+                //}
                 //Send the obtained bytes to the UI Activity via handler
                 //Log.e("DATOSPESA--->", readMessage + "");
 
