@@ -163,6 +163,17 @@ public class Pedidos {
     @SerializedName("Anotaciones")
     private String Anotaciones ;
 
+    @SerializedName("Cantcomanda")
+    private short Cantcomanda ;
+
+    public short getCantcomanda() {
+        return Cantcomanda;
+    }
+
+    public void setCantcomanda(short cantcomanda) {
+        Cantcomanda = cantcomanda;
+    }
+
     @SerializedName("Vendedores")
     @Expose
     private Vendedores vendedores;
@@ -173,6 +184,19 @@ public class Pedidos {
 
     public void setVendedores(Vendedores vendedores) {
         this.vendedores = vendedores;
+    }
+
+
+    @SerializedName("Clientes")
+    @Expose
+    private Clientes clientes;
+
+    public Clientes getClientes() {
+        return clientes;
+    }
+
+    public void setClientes(Clientes clientes) {
+        this.clientes = clientes;
     }
 
     public int getRegistro() {

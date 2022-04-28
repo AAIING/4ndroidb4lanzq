@@ -5,10 +5,85 @@
     android:layout_height="match_parent"
     tools:context=".Empresas.fragmentos.DetalleFragment">
 
-    <TableLayout
-        android:id="@+id/table_calculadora"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_detalle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="?android:attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar">
+
+        <TextView
+            android:id="@+id/view_back_nav_detalle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawableStart="@drawable/ic_white_arrow_back_24"
+            android:padding="15dp"></TextView>
+
+        <TextView
+            android:id="@+id/view_titulo_toolbar_det"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="titulo_toolbar"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"></TextView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="15dp"
+            android:gravity="right">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="150dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/view_det_tiempo_inicio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hora Inicio: 00:00"
+                    android:textColor="@color/white"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <Chronometer
+                android:id="@+id/timer_det_empaque"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="100dp"
+                android:textColor="@color/white"
+                android:textSize="30dp"
+                android:textStyle="bold"></Chronometer>
+
+            <TextView
+                android:id="@+id/view_det_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:drawableStart="@drawable/ic_baseline_more_vert_24"
+                android:padding="6dp"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <TableLayout
+        android:id="@+id/table_titulo_col_det"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/table_guardar_det"
+        android:layout_below="@id/toolbar_detalle">
 
         <!-- Table Head -->
 
@@ -19,7 +94,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
+                android:layout_weight="1.5"
                 android:gravity="center_horizontal"
                 android:padding="3dp"
                 android:text="Código"
@@ -37,7 +112,25 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:gravity="center_horizontal"
+                android:padding="3dp"
+                android:text="Presentación"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="2"
+                android:gravity="center_horizontal"
+                android:padding="3dp"
+                android:text="Descto."
+                android:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
                 android:gravity="center_horizontal"
                 android:padding="3dp"
                 android:text="Cantidad"
@@ -50,6 +143,24 @@
                 android:gravity="center_horizontal"
                 android:padding="3dp"
                 android:text="Cant.Real"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="center_horizontal"
+                android:padding="3dp"
+                android:text="Pesaje"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2.5"
+                android:gravity="center_horizontal"
+                android:padding="3dp"
                 android:textColor="@color/white" />
 
             <TextView
@@ -64,20 +175,179 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
+                android:layout_weight="4"
                 android:gravity="center_horizontal"
                 android:padding="3dp"
                 android:text=" "
                 android:textColor="@color/white" />
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="left"
+                android:padding="3dp"
+                android:text="Anular"
+                android:textColor="@color/red"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:gravity="center_horizontal"
+                android:padding="3dp"
+                android:text="Obs"
+                android:textColor="@color/white" />
 
         </TableRow>
         <!--End Table Head -->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_list_detalle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
     </TableLayout>
 
+
+    <TableLayout
+        android:gravity="center"
+        android:id="@+id/table_guardar_det"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingStart="25dp"
+        android:paddingTop="10dp">
+
+        <TableRow
+            android:gravity="center_vertical"
+            android:id="@+id/table_row_1"
+            android:padding="5dp">
+
+            <LinearLayout
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:textSize="25dp"
+                    android:text="Cajas"
+                    android:textColor="?android:textColorPrimary" />
+
+                <EditText
+                    android:id="@+id/edit_det_cajas"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:gravity="right"
+                    android:hint="0"
+                    android:textSize="25dp"
+                    android:inputType="number"></EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:textSize="25dp"
+                    android:text="Bolsas"
+                    android:textColor="?android:textColorPrimary" />
+
+                <EditText
+                    android:id="@+id/edit_det_bolsas"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:gravity="right"
+                    android:hint="0"
+                    android:textSize="25dp"
+                    android:inputType="number">
+                </EditText>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="Frágil?"
+                    android:textColor="@color/red"
+                    android:textSize="25dp" />
+
+                <CheckBox
+                    android:layout_marginStart="10dp"
+                    android:padding="10dp"
+                    android:id="@+id/chk_det_fragil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/red"
+                    android:textStyle="bold">
+                </CheckBox>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="Peso total"
+                    android:textColor="@color/red"
+                    android:textSize="25dp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/edit_det_peso_total"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:enabled="false"
+                    android:gravity="right"
+                    android:textSize="25dp"
+                    android:inputType="numberDecimal"
+                    android:hint="0"></EditText>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btn_guardar_det"
+                    android:layout_width="400dp"
+                    android:layout_height="150dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:gravity="center"
+                    android:textSize="25dp"
+                    android:textStyle="bold"
+                    android:text="boton_guardar"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </TableRow>
+    </TableLayout>
 </RelativeLayout>

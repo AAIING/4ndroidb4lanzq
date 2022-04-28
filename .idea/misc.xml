@@ -6,16 +6,22 @@
         <entry key="..\:/Android/MyApp/app/src/main/res/layout/activity_variedades_cereza.xml" value="0.259375" />
         <entry key="..\:/Android/MyApp/app/src/main/res/layout/fragment_variedades_cereza.xml" value="0.25" />
         <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/drawable-v24/ic_edit_24.xml" value="0.1" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/drawable-v24/ic_green_monitor_weight_24.xml" value="0.2115" />
         <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/drawable-v24/ic_white_add_circle_24.xml" value="0.1" />
-        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/detalle_rv_card.xml" value="0.20416666666666666" />
-        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/empacador_rv_card.xml" value="1.1829573934837092" />
-        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_detalle.xml" value="0.20416666666666666" />
-        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_empacador.xml" value="0.4010195412064571" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/drawable/enable_color.xml" value="0.1865" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/activity_main.xml" value="0.10208333333333333" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/detalle_rv_card.xml" value="0.22" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/empacador_rv_card.xml" value="0.22" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_detalle.xml" value="0.25" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_empacador.xml" value="0.2525987525987526" />
         <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_empacar.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_empresas.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_modificar_detalle.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/fragment_produccion__buscar__pesa.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/layout/operario_rv_card.xml" value="0.10208333333333333" />
         <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/menu/menu_detalle.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/menu/menu_popup.xml" value="0.18" />
+        <entry key="..\:/Users/Ignacio/Documents/Proyecto Opencode/Aplicacion_Android_Webbox/intento2/MyApp/app/src/main/res/xml/file_path.xml" value="0.1" />
       </map>
     </option>
   </component>

@@ -7,7 +7,7 @@ public class Vendedores {
     private short Referencia ;
 
     @SerializedName("Nombre")
-    private String Nombre ;
+    private String Nombre = "" ;
 
     @SerializedName("Comision1")
     private double Comision1;
@@ -61,7 +61,11 @@ public class Vendedores {
     }
 
     public String getNombre() {
-        return Nombre;
+
+        if(Nombre != null)
+            return Nombre;
+        else
+            return "";
     }
 
     public void setNombre(String nombre) {

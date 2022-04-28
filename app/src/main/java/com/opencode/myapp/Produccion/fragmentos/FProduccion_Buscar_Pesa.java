@@ -1,18 +1,13 @@
 package com.opencode.myapp.Produccion.fragmentos;
 
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
-import android.provider.Settings;
-import android.provider.SyncStateContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +15,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.opencode.myapp.Empresas.fragmentos.ModificarDetalleFragment;
 import com.opencode.myapp.R;
 
 import java.util.ArrayList;
@@ -34,14 +27,12 @@ import java.util.Set;
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
 
-
 public class FProduccion_Buscar_Pesa extends DialogFragment {
 
     private BluetoothAdapter myBluetooth = null;
     private Set<BluetoothDevice> pairedDevices;
     private ListView devicelist;
     private Button btn_buscar_dispositivos;
-    private ModificarDetalleFragment modificarDetalleFragment;
     //private AlertDialog alertDialog;
 
     private static final int REQUEST_ENABLE_BT = 1;

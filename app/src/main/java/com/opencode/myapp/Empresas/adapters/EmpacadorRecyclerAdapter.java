@@ -1,9 +1,12 @@
 package com.opencode.myapp.Empresas.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,6 +23,7 @@ public class EmpacadorRecyclerAdapter extends RecyclerView.Adapter<EmpacadorRecy
     private Context context;
     private List<Pedidos> listPedidos;
     private OnClickListener onClickListener = null;
+    private int indexPos = -1;
 
     public interface OnClickListener {
         void onEditar(View view, int position);
@@ -46,24 +50,32 @@ public class EmpacadorRecyclerAdapter extends RecyclerView.Adapter<EmpacadorRecy
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Pedidos item = listPedidos.get(holder.getAdapterPosition());
-        Vendedores item_vend = item.getVendedores();
+        //Vendedores item_vend = item.getVendedores();
 
         holder.viewPedido.setText(String.valueOf(item.getRegistro()));
         holder.viewFechaEnt.setText(item.getFechaent());
         holder.viewHoraEnt.setText(String.valueOf(item.getHoraent()));
-        holder.viemEmpacador.setText(item_vend.getNombre());
+        //holder.viemEmpacador.setText(item_vend.getNombre());
         holder.viewCliente.setText(item.getCliente());
         holder.viewComuna.setText(item.getComunaenvio());
         holder.viewDireccion.setText(item.getDireccionenvio());
         holder.viewCondominio.setText(item.getCondominioenvio());
-
-        holder.viewEditar.setOnClickListener(new View.OnClickListener() {
+        holder.rowEmpacador.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if(onClickListener == null) return;
                 onClickListener.onEditar(view, holder.getAdapterPosition());
+                indexPos = holder.getAdapterPosition();
+                notifyDataSetChanged();
             }
         });
+
+        if(indexPos == holder.getAdapterPosition()){
+            holder.rowEmpacador.setBackgroundColor(context.getResources().getColor(R.color.lightGreen));
+        }else{
+            holder.rowEmpacador.setBackgroundColor(context.getResources().getColor(R.color.white));
+        }
 
     }
 
@@ -77,8 +89,11 @@ public class EmpacadorRecyclerAdapter extends RecyclerView.Adapter<EmpacadorRecy
         private TextView viewPedido, viewFechaEnt, viewHoraEnt, viemEmpacador, viewCliente, viewComuna,
                 viewDireccion,  viewCondominio, viewEditar;
 
+        private TableRow rowEmpacador;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            rowEmpacador = itemView.findViewById(R.id.table_row_empacador);
             viewEditar = itemView.findViewById(R.id.view_edit_rv);
             viewPedido = itemView.findViewById(R.id.view_pedido);
             viewFechaEnt = itemView.findViewById(R.id.view_fecha_ent);

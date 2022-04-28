@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <!-- Table Content -->
     <TableRow
+        android:id="@+id/table_row_detalle"
         android:padding="5dp">
 
         <TextView
@@ -13,46 +14,166 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
+            android:textColor = "?android:textColorPrimary"
             android:gravity="center_horizontal"
-            android:padding="10dp" />
+            />
 
         <TextView
             android:id="@+id/view_det_producto"
             android:hint="0"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
+            android:layout_weight="5"
+            android:padding="5dp"
+            android:textColor = "?android:textColorPrimary"
             android:gravity="center_horizontal"
-            android:padding="10dp" />
+            />
+
+        <TextView
+            android:id="@+id/view_det_presentacion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:hint="0"
+            android:padding="5dp"
+            android:textColor="?android:textColorPrimary" />
+
+        <EditText
+            android:id="@+id/edit_det_descto"
+            android:hint="0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:textColor = "?android:textColorPrimary"
+            android:inputType="numberDecimal"
+            android:gravity="center_horizontal"
+            />
 
         <TextView
             android:id="@+id/view_det_cantidad"
             android:hint="0"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="4"
+            android:textColor = "?android:textColorPrimary"
             android:gravity="center_horizontal"
-            android:padding="10dp" />
+             />
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/view_det_cantreal"
             android:hint="0"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
+            android:textColor = "?android:textColorPrimary"
             android:gravity="center_horizontal"
             android:padding="10dp" />
+
+
+        <EditText
+            android:id="@+id/edit_det_pesaje"
+            android:hint="0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2.5"
+            android:inputType="numberDecimal"
+            android:gravity="center_horizontal"
+            android:textColor="@drawable/enable_color"/>
+
+        <LinearLayout
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:layout_width="10dp"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btn_obtiene_peso"
+                android:drawableStart="@drawable/ic_green_monitor_weight_24"
+                android:layout_width="45dp"
+                android:backgroundTint="@color/celeste"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/view_obtener_peso"
+                android:layout_width="wrap_content"
+                android:drawableStart="@drawable/ic_green_monitor_weight_24"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="10dp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/view_det_unidadm"
             android:hint="0"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="4"
             android:gravity="center_horizontal"
-            android:padding="10dp" />
+            android:padding="5dp" />
 
         <LinearLayout
+            android:layout_width="137dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:gravity="left"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/chk_det_cabeza"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Cabeza">
+            </CheckBox>
+
+            <CheckBox
+                android:id="@+id/chk_det_esquelon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Esquelón">
+            </CheckBox>
+
+            <TextView
+                android:text=" "
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </TextView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_marginEnd="1dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+            <CheckBox
+                android:id="@+id/chk_det_anular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red"
+                android:textStyle="bold">
+            </CheckBox>
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/edit_det_obs"
+            android:hint=""
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            />
+
+
+
+        <LinearLayout
+            android:visibility="gone"
             android:gravity="center"
             android:layout_marginEnd="1dp"
             android:orientation="vertical"

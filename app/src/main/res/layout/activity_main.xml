@@ -6,10 +6,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.opencode.MainActivity">
+    <!--
+    <TextView
+        android:id="@+id/view_iniciar_turno"
+        android:text="Iniciar Turno"
+        android:textSize="30dp"
+        android:textColor="@color/black"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </TextView>
+      android:layout_below="@+id/view_iniciar_turno"
+-->
+    <androidx.recyclerview.widget.RecyclerView
+
+        android:id="@+id/recycler_list_operarios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 
     <LinearLayout
-
+        android:visibility="gone"
         android:padding="20dp"
         android:orientation="vertical"
         android:layout_width="match_parent"

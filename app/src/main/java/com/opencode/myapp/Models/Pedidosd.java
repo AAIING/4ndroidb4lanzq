@@ -3,7 +3,33 @@ package com.opencode.myapp.Models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Pedidosd {
+import java.util.ArrayList;
+
+public class Pedidosd implements Comparable, Cloneable{
+
+    @Override
+    public Pedidosd clone(){
+        Pedidosd clone;
+
+        try{
+            clone = (Pedidosd) super.clone();
+        }catch(CloneNotSupportedException e){
+            throw new RuntimeException(e); //should not happen
+        }
+        //
+        return clone;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Pedidosd pedidosd = (Pedidosd) o;
+        //
+        if(pedidosd.getReadPesaje().equals(this.readPesaje) && pedidosd.getCalcPesaje().equals(this.CalcPesaje)) // || String.valueOf(pedidosd.getCantidadreal()).equals(String.valueOf(this.Cantidadreal))
+            return 0;
+
+        return 1;
+    }
+
 
     @SerializedName("Registro")
     public int Registro ;
@@ -131,6 +157,80 @@ public class Pedidosd {
     @SerializedName("Presentaciones")
     @Expose
     public Presentaciones presentaciones;
+
+    @SerializedName("Productos")
+    @Expose
+    public Productos productos;
+
+    @SerializedName("PresentacionesHasProductos")
+    @Expose
+    public PresentacionesHasProductos preshasprod;
+
+    public PresentacionesHasProductos getPreshasprod() {
+        return preshasprod;
+    }
+
+    public void setPreshasprod(PresentacionesHasProductos preshasprod) {
+        this.preshasprod = preshasprod;
+    }
+
+    public String CalcPesaje = "";
+
+    public double minPeso;
+
+    public double maxPeso;
+
+    public double getMinPeso() {
+        return minPeso;
+    }
+
+    public void setMinPeso(double minPeso) {
+        this.minPeso = minPeso;
+    }
+
+    public double getMaxPeso() {
+        return maxPeso;
+    }
+
+    public void setMaxPeso(double maxPeso) {
+        this.maxPeso = maxPeso;
+    }
+
+    public String getCalcPesaje() {
+        return CalcPesaje;
+    }
+
+    public void setCalcPesaje(String calcPesaje) {
+        CalcPesaje = calcPesaje;
+    }
+
+    public Productos getProductos() {
+        return productos;
+    }
+
+    public void setProductos(Productos productos) {
+        this.productos = productos;
+    }
+
+    public double Pesaje;
+
+    public String readPesaje = "";
+
+    public String getReadPesaje() {
+        return readPesaje;
+    }
+
+    public void setReadPesaje(String readPesaje) {
+        this.readPesaje = readPesaje;
+    }
+
+    public double getPesaje() {
+        return Pesaje;
+    }
+
+    public void setPesaje(double pesaje) {
+        Pesaje = pesaje;
+    }
 
     public Presentaciones getPresentaciones() {
         return presentaciones;
@@ -467,4 +567,6 @@ public class Pedidosd {
     public void setNrodocref(int nrodocref) {
         Nrodocref = nrodocref;
     }
+
+
 }

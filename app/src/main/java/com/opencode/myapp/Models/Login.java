@@ -4,23 +4,59 @@ import com.google.gson.annotations.SerializedName;
 
 public class Login {
 
-    @SerializedName("rut")
+    @SerializedName("Rut")
     private int rut;
 
-    @SerializedName("empresa")
+    @SerializedName("IdSesion")
+    private int idSesion;
+
+    @SerializedName("Empresa")
     private int empresa;
 
-    @SerializedName("div")
+    @SerializedName("UsuariosReferencia")
+    private int UsuariosReferencia;
+
+    @SerializedName("Vendedor")
+    private int vendedor;
+
+    @SerializedName("Div")
     private String div;
 
-    @SerializedName("nombre")
+    @SerializedName("Nombre")
     private String nombre;
 
-    @SerializedName("codigo")
+    @SerializedName("Codigo")
     private String codigo;
 
-    @SerializedName("clave")
+    @SerializedName("Clave")
     private String clave;
+
+    @SerializedName("HoraInicio")
+    private String HoraInicio;
+
+    public String getHoraInicio() {
+        return HoraInicio;
+    }
+
+    public void setHoraInicio(String horaInicio) {
+        HoraInicio = horaInicio;
+    }
+
+    public int getUsuariosReferencia() {
+        return UsuariosReferencia;
+    }
+
+    public void setUsuariosReferencia(int usuariosReferencia) {
+        UsuariosReferencia = usuariosReferencia;
+    }
+
+    public int getIdSesion() {
+        return idSesion;
+    }
+
+    public void setIdSesion(int idSesion) {
+        this.idSesion = idSesion;
+    }
 
     public int getEmpresa() {
         return empresa;
@@ -28,6 +64,14 @@ public class Login {
 
     public void setEmpresa(int empresa) {
         this.empresa = empresa;
+    }
+
+    public int getVendedor() {
+        return vendedor;
+    }
+
+    public void setVendedor(int vendedor) {
+        this.vendedor = vendedor;
     }
 
     public int getRut() {

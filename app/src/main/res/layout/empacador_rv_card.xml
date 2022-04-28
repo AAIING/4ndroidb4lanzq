@@ -5,8 +5,10 @@
 
     <!-- Table Content -->
     <TableRow
+        android:id="@+id/table_row_empacador"
         android:padding="5dp">
         <TextView
+            android:textColor = "?android:textColorPrimary"
             android:id="@+id/view_pedido"
             android:hint="p"
             android:layout_width="0dp"
@@ -16,8 +18,10 @@
             android:padding="10dp" />
 
         <TextView
+            android:textColor = "?android:textColorPrimary"
             android:id="@+id/view_fecha_ent"
             android:hint="0"
+            android:visibility="gone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -25,6 +29,7 @@
             android:padding="10dp" />
 
         <TextView
+            android:textColor = "?android:textColorPrimary"
             android:id="@+id/view_hora_ent"
             android:hint="0"
             android:layout_width="0dp"
@@ -34,8 +39,10 @@
             android:padding="10dp" />
 
         <TextView
+            android:textColor = "?android:textColorPrimary"
             android:id="@+id/view_empacador"
             android:hint="0"
+            android:visibility="gone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -43,6 +50,7 @@
             android:padding="10dp" />
 
         <TextView
+            android:textColor = "?android:textColorPrimary"
             android:id="@+id/view_cliente"
             android:hint="0"
             android:layout_width="0dp"
@@ -52,6 +60,7 @@
             android:padding="10dp" />
 
         <TextView
+            android:textColor = "?android:textColorPrimary"
             android:id="@+id/view_comuna"
             android:hint="0"
             android:layout_width="0dp"
@@ -61,6 +70,7 @@
             android:padding="10dp" />
 
         <TextView
+            android:textColor = "?android:textColorPrimary"
             android:id="@+id/view_direccion"
             android:hint="0"
             android:layout_width="0dp"
@@ -70,6 +80,7 @@
             android:padding="10dp" />
 
         <TextView
+            android:textColor = "?android:textColorPrimary"
             android:id="@+id/view_condominio"
             android:hint="0"
             android:layout_width="0dp"
@@ -79,6 +90,7 @@
             android:padding="10dp" />
 
         <LinearLayout
+            android:visibility="gone"
             android:gravity="center"
             android:layout_marginEnd="1dp"
             android:orientation="vertical"
@@ -91,7 +103,6 @@
                 android:drawableStart="@drawable/ic_edit_24"
                 android:textColor="#000"
                 android:textSize="15dp"
-
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

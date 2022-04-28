@@ -13,6 +13,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,18 +23,26 @@ import android.widget.Toast;
 
 import com.opencode.MainActivity;
 import com.opencode.myapp.Correcciones.Correcciones;
+import com.opencode.myapp.Empresas.Empresas;
 import com.opencode.myapp.Models.Capturas;
+import com.opencode.myapp.Models.Login;
 import com.opencode.myapp.R;
 import com.opencode.myapp.Productos.Productos;
 import com.opencode.myapp.bdsqlite.DBDatos;
 import com.opencode.myapp.bdsqlite.DBMetodos;
+import com.opencode.myapp.config.ApiConf;
 import com.opencode.myapp.config.session.SessionDatos;
+import com.opencode.myapp.config.session.SessionKeys;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import WebServices.wsSincroniza;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class FEmpresas extends Fragment {
@@ -193,7 +202,7 @@ public class FEmpresas extends Fragment {
             public void onClick(View view) {
                 AlertDialog.Builder dialogo1 = new AlertDialog.Builder(getContext());
                 dialogo1.setTitle("Importante");
-                dialogo1.setMessage("¿ Esta seguro de reiniciar sincronizado ?");
+                dialogo1.setMessage("¿Esta seguro de reiniciar sincronizado?");
                 dialogo1.setCancelable(false);
                 dialogo1.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogo1, int id) {
@@ -216,9 +225,48 @@ public class FEmpresas extends Fragment {
         btn_volver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                startActivity(intent);
-                sessionDatos.cleanSesion();
+                //
+                Call<Login> call = ApiConf.getData().getLogSesion(
+                        Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idOperario)),
+                        Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idSesion)));
+                call.enqueue(new Callback<Login>() {
+                    @Override
+                    public void onResponse(Call<Login> call, Response<Login> response) {
+                        if(response.isSuccessful())
+                        {
+                            /*
+                            Login login = response.body();
+                            sessionDatos.setLogin(login.getNombre(),
+                                    String.valueOf(login.getVendedor()),
+                                    String.valueOf(login.getIdSesion()));
+                             */
+                        }
+                        //
+                        File folder3 = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                        if (folder3.exists()) {
+                            File[] Files = folder3.listFiles();
+                            if (Files != null) {
+                                for (int j = 0; j < Files.length; j++) {
+                                    //
+                                    Files[j].delete();
+                                }
+                            }
+                        }
+
+                        Intent intent = new Intent(getContext(), MainActivity.class);
+                        startActivity(intent);
+
+                        sessionDatos.cleanSesion();
+
+                        Log.e("OK--->", response.toString());
+
+                    }
+                    @Override
+                    public void onFailure(Call<Login> call, Throwable t) {
+                        Log.e("ERROR--->", t.toString());
+
+                    }
+                });
             }
         });
 

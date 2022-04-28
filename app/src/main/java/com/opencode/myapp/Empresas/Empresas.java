@@ -23,4 +23,10 @@ public class Empresas extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_empresas,new FEmpresas()).commit();
 
     }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        return;
+    }
 }

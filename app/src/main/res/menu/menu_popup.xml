@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_gen_comanda"
+        android:title="Ticket Comanda" />
+
+    <item
+        android:id="@+id/item_gen_etiqueta"
+        android:title="Ticket Etiqueta" />
+
+    <item
+        android:id="@+id/item_gen_com_etq"
+        android:title="Ticket Comanda/Etiqueta" />
+</menu>
