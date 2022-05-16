@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,10 +37,12 @@ import com.opencode.myapp.Models.Clientes;
 import com.opencode.myapp.Models.Login;
 import com.opencode.myapp.Models.Parametros;
 import com.opencode.myapp.Models.Pedidos;
+import com.opencode.myapp.Models.Pedidosd;
 import com.opencode.myapp.Models.Sesiones;
 import com.opencode.myapp.Models.Vendedores;
 import com.opencode.myapp.R;
 import com.opencode.myapp.config.ApiConf;
+import com.opencode.myapp.config.CallInterface;
 import com.opencode.myapp.config.itext.TicketDoc;
 import com.opencode.myapp.config.session.SessionDatos;
 import com.opencode.myapp.config.session.SessionKeys;
@@ -46,13 +50,26 @@ import com.opencode.myapp.config.session.SessionKeys;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
 
 
 public class EmpacadorFragment extends Fragment {
@@ -80,6 +97,14 @@ public class EmpacadorFragment extends Fragment {
     private TextView viewTiempoInicio, viewBackNav, viewTituloBar, viewBandaInfo;
     //private String fechaPedido="";
     private TicketDoc ticketDoc;
+    //private Timer timercount;
+    //private Handler handler = new Handler();
+    //private Runnable runnable;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private CallInterface callInterface;
+
+    //private Disposable disposable;
 
     public EmpacadorFragment() {
         // Required empty public constructor
@@ -88,7 +113,6 @@ public class EmpacadorFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setHasOptionsMenu(true);
     }
 
     @Override
@@ -97,8 +121,6 @@ public class EmpacadorFragment extends Fragment {
         // Inflate the layout for this fragment
         sessionDatos = new SessionDatos(getContext());
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-        //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Bienvenido "+sessionDatos.getRecord().get(SessionKeys.nombreUsuario));
-        //((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         View view = inflater.inflate(R.layout.fragment_empacador, container, false);
         alertDialog = new AlertDialog.Builder(getContext()).create();
         progressDialog = new ProgressDialog(getContext());
@@ -111,29 +133,64 @@ public class EmpacadorFragment extends Fragment {
         viewBandaInfo = view.findViewById(R.id.view_banda_info);
         Animation marquee =  AnimationUtils.loadAnimation(getContext(), R.anim.marquee);
         viewBandaInfo.startAnimation(marquee);
-        getParametros();
-
         viewTituloBar.setText("Bienvenido "+sessionDatos.getRecord().get(SessionKeys.nombreUsuario));
         viewTiempoInicio.setText("Tiempo Inicio Turno: "+sessionDatos.getRecord().get(SessionKeys.horaInicio));
-        //
         progressDialog.show();
         progressDialog.setMessage("Cargando datos..");
-
         idoperario = Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idOperario));
-        loadPendientes(idoperario);
+        //
+        Retrofit retrofit = ApiConf.getRetrofit();
+        callInterface = retrofit.create(CallInterface.class);
+
+        compositeDisposable.add(Observable.interval(3, TimeUnit.SECONDS)
+                .flatMap(n -> callInterface.getPedidosPendientes(idoperario))
+                .repeat()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Pedidos>>() {
+                    @Override
+                    public void accept(List<Pedidos> pedidos) throws Exception {
+                        loadListEmpacador(pedidos);
+                    }
+                }, this::onError));
+
+        compositeDisposable.add(Observable.interval(3, TimeUnit.SECONDS)
+                .flatMap(n -> callInterface.getParametros())
+                .repeat()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Parametros>() {
+                    @Override
+                    public void accept(Parametros result) throws Exception {
+                        viewBandaInfo.setText(result.getBandaInfo());
+                        sessionDatos.setPesoTope(String.valueOf(result.getPesoTope()));
+                    }
+                }, this::onError));
 
         return view;
     }
 
-    void loadListEmpacador(){
+    private void onError(Throwable throwable) {
+        //Toast.makeText(this, "OnError in Observable Timer", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onStop() {
+        //
+        compositeDisposable.clear();
+        super.onStop();
+    }
+
+
+    void loadListEmpacador(List<Pedidos> pedidos){
         /***/
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        empacadorRecyclerAdapter = new EmpacadorRecyclerAdapter(getContext(), listPedidos);
+        empacadorRecyclerAdapter = new EmpacadorRecyclerAdapter(getContext(), pedidos);
         empacadorRecyclerAdapter.setOnClickListener(new EmpacadorRecyclerAdapter.OnClickListener() {
             @Override
             public void onEditar(View view, int position) {
-                Pedidos item = listPedidos.get(position);
+                Pedidos item = pedidos.get(position);
 
                 Vendedores item_vend ;
                 Clientes item_cl = item.getClientes();
@@ -160,7 +217,7 @@ public class EmpacadorFragment extends Fragment {
                 if(item.getVendedores() == null){
                     Vendedores item_vend2 = new Vendedores();
                     item_vend2.setNombre("SIN VENDEDOR");
-                    listPedidos.get(position).setVendedores(item_vend2);
+                    pedidos.get(position).setVendedores(item_vend2);
                     item_vend = item.getVendedores();
 
                 }else{
@@ -314,44 +371,5 @@ public class EmpacadorFragment extends Fragment {
                 progressDialog.dismiss();
             }
         });
-    }
-
-    private void loadPendientes(int idoperario){
-        Call<List<Pedidos>> call = ApiConf.getData().getPedidosPendientes(idoperario);
-        call.enqueue(new Callback<List<Pedidos>>() {
-            @Override
-            public void onResponse(Call<List<Pedidos>> call, Response<List<Pedidos>> response) {
-                //
-                if (response.isSuccessful()) {
-                    List<Pedidos> result = response.body();
-                    listPedidos.addAll(result);
-                    loadListEmpacador();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Pedidos>> call, Throwable t) {
-                Log.e("ERROR-->", t.getMessage());
-            }
-        });
-    }
-
-    private void getParametros(){
-       Call<Parametros> call = ApiConf.getData().getParametros();
-       call.enqueue(new Callback<Parametros>() {
-           @Override
-           public void onResponse(Call<Parametros> call, Response<Parametros> response) {
-               if (response.isSuccessful()) {
-                   Parametros result = response.body();
-                   viewBandaInfo.setText(result.getBandaInfo());
-                   sessionDatos.setPesoTope(String.valueOf(result.getPesoTope()));
-               }
-           }
-
-           @Override
-           public void onFailure(Call<Parametros> call, Throwable t) {
-
-           }
-       });
     }
 }

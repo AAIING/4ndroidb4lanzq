@@ -118,7 +118,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothAdapter myBluetooth = null;
     private BluetoothSocket btSocket = null;
-    public boolean syncpesa, actpesa, isOk = false, isOkPedido = false,  isBtConnected = false, fragil=false,balanzaB=false;
+    public boolean syncpesa, actpesa, isOk = false, isOkPedido = false,  isBtConnected = false, fragil=false;
     private double pesajeFin=0, pesotope=0, montototal=0;
     private int listPos =0,  registro =0, idsesionempaque =0, cajas=0, bolsas=0, cantcomanda=0;
 
@@ -126,7 +126,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
     private Runnable runnable;//, runnable2;
     private Drawable drawable;
 
-    private TextView viewTiempoInicio, viewBackNav, viewTituloBar, viewMenu;
+    private TextView viewTiempoInicio, viewBackNav, viewTituloBar, viewMenu, viewPausarPedido;
     private EditText editCajas, editBolsas, editPesoTotal;
     private CheckBox chkFragil;
     private Button btnGuardarDet;
@@ -174,7 +174,9 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     });
                 }
             }
-        }, 500, 500); // initial delay 1 second, interval 1 second
+        },
+                500,
+                500); // initial delay 1 second, interval 1 second
 
         setHasOptionsMenu(true);
     }
@@ -192,7 +194,8 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
         ticketDoc = new TicketDoc(getContext());
         alertDialog = new AlertDialog.Builder(getContext()).create();
         progressDialog = new ProgressDialog(getContext());
-
+        viewPausarPedido = view.findViewById(R.id.view_det_pausar_pedido);
+        viewPausarPedido.setOnClickListener(onClickPausarPedido);
         recyclerView = view.findViewById(R.id.recycler_list_detalle);
         sessionDatos = new SessionDatos(getContext());
         chkFragil = view.findViewById(R.id.chk_det_fragil);
@@ -288,6 +291,69 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
         return view;
     }
 
+
+    private View.OnClickListener onClickPausarPedido = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.setTitle("Pausar Pedido");
+            alertDialog.setMessage("¿Desea pausar el pedido?");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "PAUSAR", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //
+
+                    double pesototal = 0.0;
+
+                    if(!editPesoTotal.getText().toString().isEmpty()){
+                        pesototal = Double.parseDouble(editPesoTotal.getText().toString());
+                    }
+
+
+                    updatePedidos(registro,
+                            Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idOperario)),
+                            cajas,
+                            bolsas,
+                            montototal,
+                            pesototal,
+                            0,
+                            1);
+
+                    /*
+                    handler.removeCallbacks(runnable);
+
+                    if(btSocket != null) {
+                        try {
+                            btSocket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    EmpacadorFragment newFragment = new EmpacadorFragment();
+                    FragmentTransaction fm = getActivity().getSupportFragmentManager().beginTransaction();
+                    fm.replace(R.id.frame_empresas, newFragment);
+                    fm.commit();
+                    */
+
+                    alertDialog.dismiss();
+                }
+            });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Volver", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    alertDialog.dismiss();
+                }
+            });
+
+            alertDialog.show();
+
+
+        }
+    };
+
     private View.OnClickListener onClickMenu = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -368,7 +434,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
 
                                             String url_path = comandaDoc.getPathFile();
 
-                                            Toast.makeText(getContext(), "Documento Generado", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getContext(), "Comanda Generada", Toast.LENGTH_LONG).show();
                                         }
                                     }
 
@@ -410,7 +476,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
 
                             String url_path2 = ticketDoc.getPathFile();
 
-                            Toast.makeText(getContext(), "Documento Generado", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "Ticket Generado", Toast.LENGTH_LONG).show();
                           return true;
                         case R.id.item_gen_com_etq:
 
@@ -445,7 +511,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
 
                             String url_path3 = ticketComandaDoc.getPathFile();
 
-                            Toast.makeText(getContext(), "Documento Generado", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "Ticket y Comanda Generada", Toast.LENGTH_LONG).show();
                             return true;
                         default:
                           return false;
@@ -465,8 +531,9 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             /**VERIFICAR RANGOS DE PESO CORRECTOS*/
             for(Pedidosd item_pedidod: listDetalle){
                 Productos item_prod = item_pedidod.getProductos();
+                PresentacionesHasProductos item_presprod = item_pedidod.getPreshasprod();
 
-                if(item_prod.getRendimiento() > 0 && item_pedidod.getAnulado() == 0) {
+                if(item_presprod.getRendimiento() > 0 && item_pedidod.getAnulado() == 0) {
 
                     if (item_pedidod.getCantidadreal() <= item_pedidod.getMinPeso()) {
 
@@ -545,8 +612,11 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             cajas,
                             bolsas,
                             montototal,
-                            pesototal);
+                            pesototal,
+                            1,
+                            0);
 
+                    /*
                     handler.removeCallbacks(runnable);
 
                     if(btSocket != null) {
@@ -562,7 +632,18 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     fm.replace(R.id.frame_empresas, newFragment);
                     fm.commit();
 
-                    Toast.makeText(getContext(), "Guardado..", Toast.LENGTH_LONG).show();
+                    comandaDoc.openDocument(r6, //fecha
+                            r1, //pedido
+                            r4, //tpedido
+                            sessionDatos.getRecord().get(SessionKeys.nombreUsuario), //empacador
+                            r2, //cliente
+                            r9,//armado cat cliente
+                            listDetalle);
+
+                    String url_path = comandaDoc.getPathFile();
+
+                    Toast.makeText(getContext(), "PEDIDO CERRADO.\nCOMANDA GENERADA..", Toast.LENGTH_LONG).show();
+                     */
 
                 }
             });
@@ -591,7 +672,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     //
-                    //handler.removeCallbacks(runnable);
                     /**ELIMINA SESION SIN GUARDAR/FINALIZAR*/
                     getSesionEmpaque(Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idOperario)),
                             0,
@@ -645,7 +725,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                         try {
                             //filtra signo = dado por la balanza, si no es number atrapa exepcion
                             double pesa = Double.parseDouble(readMessage);
-                            listP.get(position).setReadPesaje(String.valueOf(pesa));
+                            listP.get(position).setReadPesaje(String.valueOf(pesa));;
                             listP.get(position).setCantidadreal(pesa);
 
                             double pesoteorico = 0;
@@ -657,7 +737,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             minPeso = pesoteorico * 0.9;
                             maxPeso = pesoteorico * 1.1 ;
 
-                            maxPeso = maxPeso * (pesotope / 100);
+                            maxPeso = maxPeso + (maxPeso * (pesotope / 100));
 
                             listP.get(position).setMinPeso(minPeso);
                             listP.get(position).setMaxPeso(maxPeso);
@@ -697,13 +777,17 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                int cajas,
                                int bolsas,
                                double montototal,
-                               double pesototal){
+                               double pesototal,
+                               int estado,
+                               int pedidopausa){
 
         Map<String, Object> jsonArrayMap = new ArrayMap<>();
         jsonArrayMap.put("Cajas", cajas);
         jsonArrayMap.put("Bolsas", bolsas);
         jsonArrayMap.put("Total", montototal);
         jsonArrayMap.put("Pesototal", pesototal);
+        jsonArrayMap.put("Estado", estado);
+        jsonArrayMap.put("Pedidopausa", pedidopausa);
 
         RequestBody body = RequestBody.create(MediaType
                 .parse("application/json; charset=utf-8"), (new JSONObject(jsonArrayMap)).toString());
@@ -713,11 +797,55 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             @Override
             public void onResponse(Call<Pedidos> call, Response<Pedidos> response) {
 
-                /**AL HACER POST/UPDATE DA UN ERROR EN LA RESPUESTA PERO SI ENTREGA LOS DATOS*/
+                /***/
                 if (response.isSuccessful()) {
                     Pedidos result = response.body();
                     //
                     Log.e("respuestaOK==>", String.valueOf(response.body()));
+                    //
+                    for(Pedidosd item_pedidod: listDetalle) {
+                        //
+                        updatePedidosd(registro,
+                                item_pedidod.getCodigo(),
+                                item_pedidod.getDescuento1(),
+                                item_pedidod.getCantidadreal(),
+                                item_pedidod.getCabeza(),
+                                item_pedidod.getEsquelon(),
+                                item_pedidod.getAnulado(),
+                                item_pedidod.getObs());
+                    }
+
+                    handler.removeCallbacks(runnable);
+
+                    if(btSocket != null) {
+                        try {
+                            btSocket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    EmpacadorFragment newFragment = new EmpacadorFragment();
+                    FragmentTransaction fm = getActivity().getSupportFragmentManager().beginTransaction();
+                    fm.replace(R.id.frame_empresas, newFragment);
+                    fm.commit();
+
+                    if(pedidopausa == 0){
+                        comandaDoc.openDocument(r6, //fecha
+                                r1, //pedido
+                                r4, //tpedido
+                                sessionDatos.getRecord().get(SessionKeys.nombreUsuario), //empacador
+                                r2, //cliente
+                                r9,//armado cat cliente
+                                listDetalle);
+
+                        String url_path = comandaDoc.getPathFile();
+
+                        Toast.makeText(getContext(), "PEDIDO CERRADO.\nCOMANDA GENERADA..", Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(getContext(), "PEDIDO PAUSADO..", Toast.LENGTH_LONG).show();
+                    }
+
 
                 } else {
                     Log.e("respuestaErr==>", String.valueOf(response.errorBody()));
@@ -728,6 +856,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             @Override
             public void onFailure(Call<Pedidos> call, Throwable t) {
                 Log.e("failureInst==>", t.toString());
+                Toast.makeText(getContext(), "ERROR..", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -793,7 +922,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
     /**FINALIZAR TURNO*/
     private void getSesionEmpaque(int idusuario, int idpedido, int idsesionempaque, final int status, String tiempoempaque){
 
-        Call<Sesiones> call = ApiConf.getData().getSesionEmpaque(0,idusuario, idpedido, idsesionempaque, status, tiempoempaque);
+        Call<Sesiones> call = ApiConf.getData().getSesionEmpaque(0, idusuario, idpedido, idsesionempaque, status, tiempoempaque);
         call.enqueue(new Callback<Sesiones>() {
             @Override
             public void onResponse(Call<Sesiones> call, Response<Sesiones> response) {
@@ -889,9 +1018,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 sessionDatos.pesaOff();
                 sessionDatos.setPesa("");
                 progressDialog.dismiss();
-
                 Toast.makeText(getContext(), "Dispositivo desconectado o apagado, vuelva a intentar.", Toast.LENGTH_LONG).show();
-
             } else {
                 //msg("Conectado..");
                 isBtConnected = true;
@@ -921,28 +1048,14 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 String[] parts = readMess.split(Pattern.quote("+"));
                 if(parts.length > 1) {
                     String pesopart = parts[1];
-                    //balanzaB = true;
-
-                    //String[] part = readMess.split(Pattern.quote("+"));
-                    //String pesop = part[1];
-
                     String[] parts2 = pesopart.split("kg\r\n");
                     String pesopart2 = parts2[0];
-                    Log.e("DATOSPESA--->", pesopart2 + "");
+                    //Log.e("DATOSPESA--->", pesopart2 + "");
                     readMessage = pesopart2;
                 }else{
                     readMessage = readMess;
                 }
 
-                // if(readMess.equals("ST,GS,+   0.00kg\r\n"))
-                //}
-
-                //if(balanzaB){
-
-                //}else{
-
-                //}
-                //Send the obtained bytes to the UI Activity via handler
                 //Log.e("DATOSPESA--->", readMessage + "");
 
             } catch (IOException e) {
@@ -950,6 +1063,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 break;
             }
         }
+
     }
 
     private void loadDetalle(int registro){

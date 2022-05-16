@@ -166,26 +166,12 @@ public class Pedidos {
     @SerializedName("Cantcomanda")
     private short Cantcomanda ;
 
-    public short getCantcomanda() {
-        return Cantcomanda;
-    }
-
-    public void setCantcomanda(short cantcomanda) {
-        Cantcomanda = cantcomanda;
-    }
+    @SerializedName("Pedidopausa")
+    private int Pedidopausa ;
 
     @SerializedName("Vendedores")
     @Expose
     private Vendedores vendedores;
-
-    public Vendedores getVendedores() {
-        return vendedores;
-    }
-
-    public void setVendedores(Vendedores vendedores) {
-        this.vendedores = vendedores;
-    }
-
 
     @SerializedName("Clientes")
     @Expose
@@ -198,6 +184,31 @@ public class Pedidos {
     public void setClientes(Clientes clientes) {
         this.clientes = clientes;
     }
+
+    public int getPedidopausa() {
+        return Pedidopausa;
+    }
+
+    public void setPedidopausa(int pedidopausa) {
+        Pedidopausa = pedidopausa;
+    }
+
+    public Vendedores getVendedores() {
+        return vendedores;
+    }
+
+    public void setVendedores(Vendedores vendedores) {
+        this.vendedores = vendedores;
+    }
+
+    public short getCantcomanda() {
+        return Cantcomanda;
+    }
+
+    public void setCantcomanda(short cantcomanda) {
+        Cantcomanda = cantcomanda;
+    }
+
 
     public int getRegistro() {
         return Registro;

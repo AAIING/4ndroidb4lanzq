@@ -34,7 +34,6 @@ public class EmpacadorRecyclerAdapter extends RecyclerView.Adapter<EmpacadorRecy
         this.onClickListener = onClickListener;
     }
 
-
     public EmpacadorRecyclerAdapter(Context context, List<Pedidos> listPedidos) {
         this.context = context;
         this.listPedidos = listPedidos;
@@ -71,12 +70,18 @@ public class EmpacadorRecyclerAdapter extends RecyclerView.Adapter<EmpacadorRecy
             }
         });
 
+
         if(indexPos == holder.getAdapterPosition()){
             holder.rowEmpacador.setBackgroundColor(context.getResources().getColor(R.color.lightGreen));
         }else{
-            holder.rowEmpacador.setBackgroundColor(context.getResources().getColor(R.color.white));
-        }
 
+            if(item.getPedidopausa() == 1){
+                //holder.viewIconPause.setVisibility(View.VISIBLE);
+                holder.rowEmpacador.setBackgroundColor(context.getResources().getColor(R.color.yellow_white));
+            }else{
+                holder.rowEmpacador.setBackgroundColor(context.getResources().getColor(R.color.white));
+            }
+        }
     }
 
     @Override
@@ -87,12 +92,13 @@ public class EmpacadorRecyclerAdapter extends RecyclerView.Adapter<EmpacadorRecy
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView viewPedido, viewFechaEnt, viewHoraEnt, viemEmpacador, viewCliente, viewComuna,
-                viewDireccion,  viewCondominio, viewEditar;
+                viewDireccion,  viewCondominio, viewEditar, viewIconPause;
 
         private TableRow rowEmpacador;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            viewIconPause = itemView.findViewById(R.id.view_icon_pause);
             rowEmpacador = itemView.findViewById(R.id.table_row_empacador);
             viewEditar = itemView.findViewById(R.id.view_edit_rv);
             viewPedido = itemView.findViewById(R.id.view_pedido);

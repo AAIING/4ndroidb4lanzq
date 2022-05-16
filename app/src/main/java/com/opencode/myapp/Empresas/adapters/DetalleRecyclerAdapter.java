@@ -36,6 +36,7 @@ import com.opencode.myapp.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class DetalleRecyclerAdapter extends RecyclerView.Adapter<DetalleRecyclerAdapter.ViewHolder>{
 
@@ -105,8 +106,8 @@ public class DetalleRecyclerAdapter extends RecyclerView.Adapter<DetalleRecycler
         }
 
         holder.viewCodigo.setText(String.valueOf(item.getCodigo()));
-        holder.viewProducto.setText((item.getDetalle()));
-        holder.viewPresent.setText(item_pres.getNombre());
+        holder.viewProducto.setText(item.getDetalle().toUpperCase(Locale.ROOT));
+        holder.viewPresent.setText(item_pres.getNombre().toUpperCase(Locale.ROOT));
         holder.viewCantidad.setText(String.valueOf(item.getCantidad()));
         holder.viewCantReal.setText(item.getCalcPesaje());
         holder.viewUnidadM.setText(item.getUnidad());
@@ -136,7 +137,10 @@ public class DetalleRecyclerAdapter extends RecyclerView.Adapter<DetalleRecycler
         });
 
         holder.editObs.setEnabled(false);
-        holder.editObs.setText(item.getObs());
+
+        if(item.getObs() != null)
+        holder.editObs.setText(item.getObs().toUpperCase(Locale.ROOT));
+
         holder.editObs.setTextColor(Color.BLACK);
 
         holder.editPesaje.setText(item.getReadPesaje());
@@ -147,9 +151,12 @@ public class DetalleRecyclerAdapter extends RecyclerView.Adapter<DetalleRecycler
             holder.btnObtPeso.setVisibility(View.GONE);
             holder.chkCabeza.setVisibility(View.GONE);
             holder.chkEsquelon.setVisibility(View.GONE);
+
         } else{
             holder.editPesaje.setEnabled(false);
-            listDetalle.get(holder.getAdapterPosition()).setCantidadreal(0);
+
+            holder.editPesaje.setText(""+item.getCantidadreal());
+            //listDetalle.get(holder.getAdapterPosition()).setCantidadreal(0);
         }
 
         if(!item.getReadPesaje().equals("")){
@@ -162,6 +169,7 @@ public class DetalleRecyclerAdapter extends RecyclerView.Adapter<DetalleRecycler
                 } else {
                     holder.editPesaje.setTextColor(Color.BLACK);
                 }
+
             }else{
                 holder.editPesaje.setText(""+item.getCantidad());
                 holder.editPesaje.setTextColor(Color.BLACK);

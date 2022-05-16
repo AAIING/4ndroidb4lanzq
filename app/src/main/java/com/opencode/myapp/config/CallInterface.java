@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -45,13 +47,13 @@ public interface CallInterface {
                          @Query("idsesion") int idsesion);
 
     @GET("api/pedidos/pendientes")
-    Call<List<Pedidos>> getPedidosPendientes(@Query("idoperario") int idoperario);
+    Observable<List<Pedidos>> getPedidosPendientes(@Query("idoperario") int idoperario);
+
+    @GET("api/pedidos/parametros")
+    Observable<Parametros> getParametros();
 
     @GET("api/pedidos/detalle")
     Call<List<Pedidosd>> getPedidosdDetalle(@Query("registro") int registro);
-
-    @GET("api/pedidos/parametros")
-    Call<Parametros> getParametros();
 
     @GET("api/pedidos/cuentacomanda")
     Call<Pedidos> getCantComanda(@Query("registro") int registro,
