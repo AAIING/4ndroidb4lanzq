@@ -1,11 +1,18 @@
 package com.opencode.myapp.Empresas.fragmentos;
 
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,10 +43,14 @@ import com.opencode.myapp.config.session.SessionKeys;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import WebServices.wsSincroniza;
+import ZPL.IPort;
+import ZPL.ZPLPrinterHelper;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,6 +68,8 @@ public class FEmpresas extends Fragment {
     private String idsinc;
     private SessionDatos sessionDatos;
 
+
+
     public FEmpresas() {
         // Required empty public constructor
     }
@@ -70,6 +83,8 @@ public class FEmpresas extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -285,7 +300,6 @@ public class FEmpresas extends Fragment {
             fm.commit();
         }
     };
-
 
 
     public class Sincronizar extends  AsyncTask<Void, Void, String> {

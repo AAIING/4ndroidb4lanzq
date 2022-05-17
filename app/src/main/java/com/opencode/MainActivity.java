@@ -8,14 +8,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -41,9 +47,13 @@ import com.opencode.myapp.config.session.SessionKeys;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import WebServices.wsLogin;
+import ZPL.IPort;
+import ZPL.ZPLPrinterHelper;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -158,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     void listaOperarios(){
 
         recyclerView.setHasFixedSize(true);
@@ -197,7 +206,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(operarioRecyclerAdapter);
     }
 
-
     void logSesion(int idoperario, String nombre){
         //
         Call<Login> call = ApiConf.getData().getLogSesion(idoperario, 0);
@@ -228,8 +236,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     void getOperarios(){
         Call<List<Operarios>> call = ApiConf.getData().getListaOperarios();
         call.enqueue(new Callback<List<Operarios>>() {
@@ -249,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
     /***/
     void login(String usr, String contrasena) {

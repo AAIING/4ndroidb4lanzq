@@ -85,7 +85,7 @@ public class ComandaDoc {
         pdfFile = new File (folder, nomDoc);
         pathFile = pdfFile.getPath();
         try{
-            document = new Document(new Rectangle(850,  850), 1, 1, 1, 1);
+            document = new Document(new Rectangle(850,  650), 1, 1, 1, 1);
             pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
             paragraphBorder = new ParagraphBorder();
             pdfWriter.setPageEvent(paragraphBorder);

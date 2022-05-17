@@ -1,10 +1,24 @@
 package com.opencode.myapp.Empresas.fragmentos;
 
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.pdf.PdfRenderer;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,13 +66,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import ZPL.IPort;
+import ZPL.ZPLPrinterHelper;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -104,7 +129,17 @@ public class EmpacadorFragment extends Fragment {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private CallInterface callInterface;
 
+
     //private Disposable disposable;
+    //
+    private String ConnectType="";
+    private UsbManager mUsbManager=null;
+    private UsbDevice device=null;
+    private static final String ACTION_USB_PERMISSION = "com.HPRTSDKSample";
+    private PendingIntent mPermissionIntent=null;
+    private static IPort Printer=null;
+    private ZPLPrinterHelper zplPrinterHelper;
+
 
     public EmpacadorFragment() {
         // Required empty public constructor
@@ -115,6 +150,98 @@ public class EmpacadorFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    void conectaImpresoraUSB(){
+
+        try {
+            if (zplPrinterHelper != null) {
+                zplPrinterHelper.PortClose();
+            }
+
+            ConnectType = "USB";
+            //HPRTPrinter=new ZPLPrinterHelper(thisCon,arrPrinterList.getItem(spnPrinterList.getSelectedItemPosition()).toString());
+            //USB not need call "iniPort"
+            mUsbManager = (UsbManager) getContext().getSystemService(Context.USB_SERVICE);
+            HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
+            Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
+
+            boolean HavePrinter = false;
+
+            while (deviceIterator.hasNext()) {
+                device = deviceIterator.next();
+                int count = device.getInterfaceCount();
+                for (int i = 0; i < count; i++) {
+                    UsbInterface intf = device.getInterface(i);
+                    if (intf.getInterfaceClass() == 7) {
+                        HavePrinter = true;
+                        mUsbManager.requestPermission(device, mPermissionIntent);
+                    }
+                }
+            }
+
+            if (!HavePrinter)
+                Toast.makeText(getContext(), "NO HAY IMPRESORA PARA CONECTAR..",
+                        Toast.LENGTH_LONG).show();
+            //txtTips.setText(thisCon.getString(R.string.activity_main_connect_usb_printer));
+        }
+        catch (Exception e)
+        {
+            //Log.e("HPRTSDKSample", (new StringBuilder("Activity_Main --> onClickConnect "+ConnectType)).append(e.getMessage()).toString());
+        }
+
+    }
+
+    private BroadcastReceiver mUsbReceiver = new BroadcastReceiver()
+    {
+        public void onReceive(Context context, Intent intent)
+        {
+            try
+            {
+                String action = intent.getAction();
+                if (ACTION_USB_PERMISSION.equals(action))
+                {
+                    synchronized (this)
+                    {
+                        device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false))
+                        {
+                            if(zplPrinterHelper.PortOpen(device)!=0)
+                            {
+//				        		HPRTPrinter=null;
+                                //txtTips.setText(thisCon.getString(R.string.activity_main_connecterr));
+                                Toast.makeText(getContext(), "ERROR al conectar..",
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            else
+                            Toast.makeText(getContext(), "OK Conectado.",
+                                    Toast.LENGTH_SHORT).show();
+                            //else
+                            //txtTips.setText(thisCon.getString(R.string.activity_main_connected));
+
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action))
+                {
+                    device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (device != null)
+                    {
+                        zplPrinterHelper.PortClose();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("HPRTSDKSample", (new StringBuilder("Activity_Main --> mUsbReceiver ")).append(e.getMessage()).toString());
+            }
+        }
+    };
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -122,6 +249,14 @@ public class EmpacadorFragment extends Fragment {
         sessionDatos = new SessionDatos(getContext());
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         View view = inflater.inflate(R.layout.fragment_empacador, container, false);
+
+        //IMPRESORA
+        mPermissionIntent = PendingIntent.getBroadcast(getContext(), 0, new Intent(ACTION_USB_PERMISSION), 0);
+        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+        getContext().registerReceiver(mUsbReceiver, filter);
+        zplPrinterHelper = ZPLPrinterHelper.getZPL(getContext());
+        conectaImpresoraUSB();
+
         alertDialog = new AlertDialog.Builder(getContext()).create();
         progressDialog = new ProgressDialog(getContext());
         recyclerView = view.findViewById(R.id.recycler_list_empaca);
@@ -360,7 +495,47 @@ public class EmpacadorFragment extends Fragment {
                             nomCliente, //nombre cliente
                             direccion); //direccion
 
+                    String file_path = ticketDoc.getPathFile();
+
+                    File pdfFile = new File(file_path);
+                    //List<String> list_path = pdfToFileImg(pdfFile);
+                    //PrintSampleReceipt("1");
+                    //InputStream afis = null;//打印模版放在assets文件夹里
+                    //afis = getContext().getResources().getAssets().open("94699.png");
+                    //String path = new String(InputStreamToByte(afis ),"utf-8");
+                    //final ProgressDialog progressDialog = new ProgressDialog(getContext());
+
+                    progressDialog.setMessage("Imprimiendo..");
+                    progressDialog.show();
+
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            super.run();
+                            try{
+                                //String strImageFile=data.getExtras().getString("FilePath");
+                                //Drawable drawableLogo = getContext().getResources().getDrawable(R.drawable.comanda2);
+                                //Bitmap bmp = ((BitmapDrawable) drawableLogo).getBitmap();
+                                List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
+
+                               //for(String path_: list_path) {
+                                for(Bitmap bmp: list_bitmap) {
+                                    //Bitmap bmp = BitmapFactory.decodeFile(path_);
+                                    zplPrinterHelper.start();
+                                    zplPrinterHelper.printBitmap("60", "60", bmp);
+                                    zplPrinterHelper.end();
+                               }
+
+                                progressDialog.dismiss();
+
+                            }catch (Exception e){
+                                progressDialog.dismiss();
+                            }
+                        }
+                    }.start();
+
                     Toast.makeText(getContext(), "Ticket Ingreso N°Pedido "+String.valueOf(registro)+" Generado..", Toast.LENGTH_LONG).show();
+
                 }
                 progressDialog.dismiss();
             }
@@ -372,4 +547,62 @@ public class EmpacadorFragment extends Fragment {
             }
         });
     }
+
+    private  ArrayList<Bitmap> pdfToBitmap(File pdfFile) {
+
+        ArrayList<Bitmap> bitmaps = new ArrayList<>();
+
+        try {
+            PdfRenderer renderer = new PdfRenderer(ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY));
+
+            Bitmap bitmap;
+
+            final int pageCount = renderer.getPageCount();
+
+            for (int i = 0; i < pageCount; i++) {
+
+                PdfRenderer.Page page = renderer.openPage(i);
+
+                int width = getResources().getDisplayMetrics().densityDpi / 72 * page.getWidth();
+                int height = getResources().getDisplayMetrics().densityDpi / 72 * page.getHeight();
+
+                bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+                Canvas canvas = new Canvas(bitmap);
+                canvas.drawColor(Color.WHITE);
+                canvas.drawBitmap(bitmap, 0, 0, null);
+
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+
+                bitmaps.add(getResizedBitmap(bitmap, 750, 750));
+
+                // close the page
+                page.close();
+
+            }
+
+            // close the renderer
+            renderer.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return bitmaps;
+    }
+
+    public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+        bm.recycle();
+        return resizedBitmap;
+    }
+
 }
