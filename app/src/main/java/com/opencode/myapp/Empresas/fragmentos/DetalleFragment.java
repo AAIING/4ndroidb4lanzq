@@ -10,6 +10,8 @@ import static com.opencode.myapp.Empresas.fragmentos.EmpacadorFragment.ID_PEDIDO
 import static com.opencode.myapp.Empresas.fragmentos.EmpacadorFragment.ID_SESION_EMPAQUE_KEY;
 import static com.opencode.myapp.Empresas.fragmentos.EmpacadorFragment.NOMBRE_CLIENTE_KEY;
 import static com.opencode.myapp.Empresas.fragmentos.EmpacadorFragment.NOMBRE_VENDEDOR_KEY;
+import static com.opencode.myapp.Empresas.fragmentos.EmpacadorFragment.NUM_PEDIDO_PAUSA_KEY;
+import static com.opencode.myapp.Empresas.fragmentos.EmpacadorFragment.PEDIDO_PAUSADO_KEY;
 import static com.opencode.myapp.Empresas.fragmentos.EmpacadorFragment.REGISTRO_DETALLE_KEY;
 
 import android.annotation.SuppressLint;
@@ -133,9 +135,10 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothAdapter myBluetooth = null;
     private BluetoothSocket btSocket = null;
-    public boolean syncpesa, actpesa, isOk = false, isOkPedido = false,  isBtConnected = false, fragil=false;
+    public boolean syncpesa,actpesa,isOk=false,isOkPedido=false,isBtConnected=false,fragil=false;
     private double pesajeFin=0, pesotope=0, montototal=0;
-    private int listPos =0,  registro =0, idsesionempaque =0, cajas=0, bolsas=0, cantcomanda=0;
+    private int listPos =0,registro =0,idsesionempaque =0,
+    cajas=0,bolsas=0,cantcomanda=0,numpedidopausa=0,pedidopausa=0;
 
     private Handler handler = new Handler();
     private Runnable runnable;//, runnable2;
@@ -212,12 +215,13 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
         //((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         View view = inflater.inflate(R.layout.fragment_detalle, container, false);
         //IMPRESORA
+        /*
         mPermissionIntent = PendingIntent.getBroadcast(getContext(), 0, new Intent(ACTION_USB_PERMISSION), 0);
         IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         getContext().registerReceiver(mUsbReceiver, filter);
         zplPrinterHelper = ZPLPrinterHelper.getZPL(getContext());
         conectaImpresoraUSB();
-
+        */
         comandaDoc = new ComandaDoc(getContext());
         ticketComandaDoc = new TicketComandaDoc(getContext());
         ticketDoc = new TicketDoc(getContext());
@@ -253,6 +257,8 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             r7 = getArguments().getString(COMUNA_PEDIDO_KEY);
             r8 = getArguments().getString(DIRECCION_PEDIDO_KEY);
             r9 = getArguments().getString(CATEGORIA_CLIENTE_KEY).toUpperCase(Locale.ROOT);
+            numpedidopausa = Integer.parseInt(getArguments().getString(NUM_PEDIDO_PAUSA_KEY));
+            pedidopausa = Integer.parseInt(getArguments().getString(PEDIDO_PAUSADO_KEY));
 
             if(getArguments().getString(CONDOMINIO_CLIENTE_KEY) != null) {
                 r10 = getArguments().getString(CONDOMINIO_CLIENTE_KEY).toUpperCase(Locale.ROOT);
@@ -415,30 +421,29 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
     private View.OnClickListener onClickPausarPedido = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            //
+            if(numpedidopausa < 3 || pedidopausa == 1) {
+                alertDialog.setCanceledOnTouchOutside(false);
+                alertDialog.setTitle("Pausar Pedido");
+                alertDialog.setMessage("¿Desea pausar el pedido?");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "PAUSAR", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //
+                        double pesototal = 0.0;
 
-            alertDialog.setCanceledOnTouchOutside(false);
-            alertDialog.setTitle("Pausar Pedido");
-            alertDialog.setMessage("¿Desea pausar el pedido?");
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "PAUSAR", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //
+                        if (!editPesoTotal.getText().toString().isEmpty()) {
+                            pesototal = Double.parseDouble(editPesoTotal.getText().toString());
+                        }
 
-                    double pesototal = 0.0;
-
-                    if(!editPesoTotal.getText().toString().isEmpty()){
-                        pesototal = Double.parseDouble(editPesoTotal.getText().toString());
-                    }
-
-
-                    updatePedidos(registro,
-                            Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idOperario)),
-                            cajas,
-                            bolsas,
-                            montototal,
-                            pesototal,
-                            0,
-                            1);
+                        updatePedidos(registro,
+                                Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idOperario)),
+                                cajas,
+                                bolsas,
+                                montototal,
+                                pesototal,
+                                0,
+                                1);
 
                     /*
                     handler.removeCallbacks(runnable);
@@ -457,19 +462,28 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     fm.commit();
                     */
 
-                    alertDialog.dismiss();
-                }
-            });
-            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Volver", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                        alertDialog.dismiss();
+                    }
+                });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Volver", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-                    alertDialog.dismiss();
-                }
-            });
+                        alertDialog.dismiss();
+                    }
+                });
 
-            alertDialog.show();
+                alertDialog.show();
 
+            } else {
+
+                //if(numpedidopausa > 3)
+                Toast.makeText(getContext(), "NO PUEDE PAUSAR PEDIDOS SIN HABER TERMINADO AL MENOS UNO (1)", Toast.LENGTH_LONG).show();
+                /*
+                if(pedidopausa > 0)
+                Toast.makeText(getContext(), "EL PEDIDO YA SE ENCUENTRA EN PAUSA", Toast.LENGTH_LONG).show();
+                */
+            }
 
         }
     };
@@ -486,7 +500,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                         case R.id.item_gen_comanda:
 
                             if(cantcomanda >= 1) {
-
                                 alertDialog.setCanceledOnTouchOutside(false);
                                 alertDialog.setTitle("Generar Comanda N°: "+(cantcomanda + 1));
                                 alertDialog.setMessage("¿Desea generar otra comanda?");
@@ -647,16 +660,12 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
         public void onClick(View v) {
             //
             DecimalFormat fd = new DecimalFormat("###,###.##");
-
             /**VERIFICAR RANGOS DE PESO CORRECTOS*/
             for(Pedidosd item_pedidod: listDetalle){
                 Productos item_prod = item_pedidod.getProductos();
                 PresentacionesHasProductos item_presprod = item_pedidod.getPreshasprod();
-
                 if(item_presprod.getRendimiento() > 0 && item_pedidod.getAnulado() == 0) {
-
                     if (item_pedidod.getCantidadreal() <= item_pedidod.getMinPeso()) {
-
                         alertRango("Cantidad Real menor al rango de pesaje",
                                 "El código: " + item_pedidod.getCodigo() + " es menor al rango de peso: " + fd.format(item_pedidod.getMinPeso()) +
                                         " de pesaje establecido.\nEste debe ser mayor.");
@@ -664,7 +673,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     }
 
                     if (item_pedidod.getCantidadreal() >= item_pedidod.getMaxPeso()) {
-
                         alertRango("Cantidad Real mayor al rango de pesaje",
                                 "El código: " + item_pedidod.getCodigo() + " es mayor al rango: " + fd.format(item_pedidod.getMaxPeso()) +
                                         " de pesaje establecido.\nEste debe ser menor.");
@@ -672,7 +680,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     }
                 }
             }
-
             //
             if(!editCajas.getText().toString().isEmpty()){
                 cajas = Integer.parseInt(editCajas.getText().toString());
@@ -680,12 +687,10 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             if(!editBolsas.getText().toString().isEmpty()){
                 bolsas = Integer.parseInt(editBolsas.getText().toString());
             }
-
             if(bolsas == 0 && cajas == 0){
                 alertRango("Empaque","Debe especificar al menos una (1) Bolsa o Caja.");
                 return;
             }
-
             alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.setTitle("Cerrar Pedido");
             alertDialog.setMessage("¿Esta seguro de cerrar pedido?");
@@ -746,12 +751,10 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             e.printStackTrace();
                         }
                     }
-
                     EmpacadorFragment newFragment = new EmpacadorFragment();
                     FragmentTransaction fm = getActivity().getSupportFragmentManager().beginTransaction();
                     fm.replace(R.id.frame_empresas, newFragment);
                     fm.commit();
-
                     comandaDoc.openDocument(r6, //fecha
                             r1, //pedido
                             r4, //tpedido
@@ -761,23 +764,17 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             listDetalle);
 
                     String url_path = comandaDoc.getPathFile();
-
                     Toast.makeText(getContext(), "PEDIDO CERRADO.\nCOMANDA GENERADA..", Toast.LENGTH_LONG).show();
                      */
-
                 }
             });
-
             alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Volver", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-
                     alertDialog.dismiss();
                 }
             });
-
             alertDialog.show();
-
         }
     };
 
@@ -827,9 +824,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 final Pedidosd item = listDetalle.get(position);
                 Productos item_prod = item.getProductos();
                 final PresentacionesHasProductos item_preshasprod = item.getPreshasprod();
-
                 handler.removeCallbacks(runnable);
-
                 runnable = new Runnable() {
                     @Override
                     public void run() {
@@ -916,7 +911,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
         call.enqueue(new Callback<Pedidos>() {
             @Override
             public void onResponse(Call<Pedidos> call, Response<Pedidos> response) {
-
                 /***/
                 if (response.isSuccessful()) {
                     Pedidos result = response.body();
@@ -950,7 +944,9 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     fm.replace(R.id.frame_empresas, newFragment);
                     fm.commit();
 
+
                     if(pedidopausa == 0){
+                        /* POR SI cliente SE ARREPIENTE Y QUIERE VOLVER A IMPRIMIR EN SALIDA
                         comandaDoc.openDocument(r6, //fecha
                                 r1, //pedido
                                 r4, //tpedido
@@ -958,46 +954,34 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                 r2, //cliente
                                 r9,//armado cat cliente
                                 listDetalle);
-
                         String file_path = comandaDoc.getPathFile();
-
                         File pdfFile = new File(file_path);
-
                         progressDialog.setMessage("Imprimiendo..");
                         progressDialog.show();
-
+                        List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
                         new Thread(){
                             @Override
                             public void run() {
                                 super.run();
-                                try{
-                                    //String strImageFile=data.getExtras().getString("FilePath");
-                                    //Drawable drawableLogo = getContext().getResources().getDrawable(R.drawable.comanda2);
-                                    //Bitmap bmp = ((BitmapDrawable) drawableLogo).getBitmap();
-                                    List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
-
-                                    //for(String path_: list_path) {
-                                    for(Bitmap bmp: list_bitmap) {
-                                        //Bitmap bmp = BitmapFactory.decodeFile(path_);
-
-                                        zplPrinterHelper.start();
-                                        zplPrinterHelper.printBitmap("60", "60", bmp);
-                                        zplPrinterHelper.end();
+                                    try{
+                                        for(Bitmap bmp: list_bitmap) {
+                                            zplPrinterHelper.start();
+                                            zplPrinterHelper.printBitmap("60", "60", bmp);
+                                            zplPrinterHelper.end();
+                                        }
+                                        progressDialog.dismiss();
+                                    }catch (Exception e){
+                                        progressDialog.dismiss();
                                     }
-
-                                    progressDialog.dismiss();
-
-                                }catch (Exception e){
-                                    progressDialog.dismiss();
-                                }
                             }
                         }.start();
 
                         Toast.makeText(getContext(), "PEDIDO CERRADO.\nCOMANDA GENERADA..", Toast.LENGTH_LONG).show();
+                        */
+
                     }else{
                         Toast.makeText(getContext(), "PEDIDO PAUSADO..", Toast.LENGTH_LONG).show();
                     }
-
 
                 } else {
                     Log.e("respuestaErr==>", String.valueOf(response.errorBody()));
@@ -1238,15 +1222,11 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
         });
     }
 
-    private  ArrayList<Bitmap> pdfToBitmap(File pdfFile) {
-
+    private ArrayList<Bitmap> pdfToBitmap(File pdfFile) {
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
-
         try {
             PdfRenderer renderer = new PdfRenderer(ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY));
-
             Bitmap bitmap;
-
             final int pageCount = renderer.getPageCount();
 
             for (int i = 0; i < pageCount; i++) {

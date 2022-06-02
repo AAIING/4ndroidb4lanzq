@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:visible="false"
         android:id="@+id/item_gen_comanda"
         android:title="Ticket Comanda" />
 
@@ -11,6 +12,7 @@
         android:title="Ticket Etiqueta" />
 
     <item
+        android:visible="false"
         android:id="@+id/item_gen_com_etq"
         android:title="Ticket Comanda/Etiqueta" />
 </menu>
