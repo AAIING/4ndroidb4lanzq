@@ -52,6 +52,7 @@ public class DBMetodos extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db)
     {
         db.execSQL(CREATE_TABLE_CAPTURAS);
+        db.execSQL(CREATE_TABLE_ITEMID);
         db.execSQL(CREATE_TABLE_USUARIOS);
         db.execSQL(CREATE_TABLE_SINCRONIZADO);
         db.execSQL("INSERT INTO "+DBDatos.TABLE_USUARIOS+" VALUES ('ADMIN', 'TAQA')");
@@ -65,6 +66,16 @@ public class DBMetodos extends SQLiteOpenHelper {
         db.execSQL(DROP_TABLE_SINCRONIZADO);
         onCreate(db);
     }
+
+
+    public static final String CREATE_TABLE_ITEMID = " CREATE TABLE ITEMSID( " +
+            "ID_ITEM            INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,  " +
+            "CODIGO             VARCHAR(200) NOT NULL,  " +
+            "TIPOITEM           INTEGER NOT NULL, " +
+            "PEDIDOSREGISTRO    INTEGER NOT NULL " +
+            ");";
+
+
 
     public boolean validarUsuario(String usuario,String password,  SQLiteDatabase db){
         String[] projection = {DBDatos.USUARIO};

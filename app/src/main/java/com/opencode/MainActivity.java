@@ -79,9 +79,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         recyclerView = findViewById(R.id.recycler_list_operarios);
         alertDialog = new AlertDialog.Builder(this).create();
-
         getOperarios();
-
         if (ActivityCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -169,7 +167,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void listaOperarios(){
-
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         operarioRecyclerAdapter = new OperarioRecyclerAdapter(this, listOperarios);
@@ -177,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSelect(View view, int position) {
                 Operarios item = listOperarios.get(position);
-
                 alertDialog.setCanceledOnTouchOutside(false);
                 alertDialog.setTitle("Iniciar Turno");
                 alertDialog.setMessage("¿Esta seguro de iniciar turno?");
@@ -195,12 +191,10 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Volver", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         alertDialog.dismiss();
                     }
                 });
                 alertDialog.show();
-
             }
         });
         recyclerView.setAdapter(operarioRecyclerAdapter);

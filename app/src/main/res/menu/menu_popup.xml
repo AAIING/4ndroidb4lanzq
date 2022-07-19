@@ -8,6 +8,7 @@
         android:title="Ticket Comanda" />
 
     <item
+        android:visible="false"
         android:id="@+id/item_gen_etiqueta"
         android:title="Ticket Etiqueta" />
 

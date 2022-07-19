@@ -28,6 +28,14 @@
             </Button>
 
             <Button
+                android:id="@+id/btn_opcion_empacador_restaurant"
+                android:text="Empacar restaurant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </Button>
+
+            <Button
                 android:id="@+id/btn_opcion1"
                 android:text="Empresa 1"
                 android:layout_width="match_parent"

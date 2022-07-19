@@ -10,7 +10,6 @@ public class Pedidosd implements Comparable, Cloneable{
     @Override
     public Pedidosd clone(){
         Pedidosd clone;
-
         try{
             clone = (Pedidosd) super.clone();
         }catch(CloneNotSupportedException e){
@@ -21,15 +20,17 @@ public class Pedidosd implements Comparable, Cloneable{
     }
 
     @Override
-    public int compareTo(Object o) {
-        Pedidosd pedidosd = (Pedidosd) o;
+    public int compareTo(Object obj) {
+        Pedidosd pedidosd = (Pedidosd) obj;
         //
-        if(pedidosd.getReadPesaje().equals(this.readPesaje) && pedidosd.getCalcPesaje().equals(this.CalcPesaje)) // || String.valueOf(pedidosd.getCantidadreal()).equals(String.valueOf(this.Cantidadreal))
+        if(pedidosd.getReadPesaje().equals(this.readPesaje) &&
+                pedidosd.getCalcPesaje().equals(this.CalcPesaje) &&
+                    pedidosd.getPesototalfila().equals(this.Pesototalfila) &&
+                        pedidosd.getTara().equals(this.Tara))
             return 0;
 
         return 1;
     }
-
 
     @SerializedName("Registro")
     public int Registro ;
@@ -165,6 +166,26 @@ public class Pedidosd implements Comparable, Cloneable{
     @SerializedName("PresentacionesHasProductos")
     @Expose
     public PresentacionesHasProductos preshasprod;
+
+    public String Tara ="0";
+
+    public String getTara() {
+        return Tara;
+    }
+
+    public void setTara(String tara) {
+        Tara = tara;
+    }
+
+    public String Pesototalfila = "" ;
+
+    public String getPesototalfila() {
+        return Pesototalfila;
+    }
+
+    public void setPesototalfila(String pesototalfila) {
+        Pesototalfila = pesototalfila;
+    }
 
     public PresentacionesHasProductos getPreshasprod() {
         return preshasprod;

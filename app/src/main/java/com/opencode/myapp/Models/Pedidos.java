@@ -169,6 +169,9 @@ public class Pedidos {
     @SerializedName("Pedidopausa")
     private int Pedidopausa ;
 
+    @SerializedName("Empaquerestaurant")
+    private int Empaquerestaurant ;
+
     @SerializedName("Vendedores")
     @Expose
     private Vendedores vendedores;
@@ -176,6 +179,25 @@ public class Pedidos {
     @SerializedName("Clientes")
     @Expose
     private Clientes clientes;
+
+    @SerializedName("Fechaelab")
+    private String Fechaelab ;
+
+    public String getFechaelab() {
+        return Fechaelab;
+    }
+
+    public void setFechaelab(String fechaelab) {
+        Fechaelab = fechaelab;
+    }
+
+    public int getEmpaquerestaurant() {
+        return Empaquerestaurant;
+    }
+
+    public void setEmpaquerestaurant(int empaquerestaurant) {
+        Empaquerestaurant = empaquerestaurant;
+    }
 
     public Clientes getClientes() {
         return clientes;

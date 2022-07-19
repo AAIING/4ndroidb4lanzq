@@ -53,11 +53,15 @@ public class PedidosdDiffCallback extends DiffUtil.Callback{
         Pedidosd oldPedidod = mOldPedidodList.get(oldItemPosition);
 
         Bundle bundle = new Bundle();
-        /*
-        if(!newPedidod.getCalcPesaje().equals(oldPedidod.getCalcPesaje())){
-            bundle.putString("cantreal", newPedidod.getCalcPesaje());
+
+        if(!newPedidod.getTara().equals(oldPedidod.getTara())){
+            bundle.putString("tara", newPedidod.getTara());
         }
-        */
+
+        if(!newPedidod.getPesototalfila().equals(oldPedidod.getPesototalfila())){
+            bundle.putString("pesototal", newPedidod.getPesototalfila());
+        }
+
         if(!newPedidod.getReadPesaje().equals(oldPedidod.getReadPesaje())){
            bundle.putString("pesaje", newPedidod.getReadPesaje());
         }

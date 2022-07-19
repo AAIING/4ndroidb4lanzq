@@ -13,7 +13,7 @@ public class SessionDatos {
 
     public SessionDatos(Context mContext) {
         this.mContext = mContext;
-        preferences=mContext.getSharedPreferences(SessionKeys.data_app.name(), Context.MODE_PRIVATE);
+        preferences=mContext.getSharedPreferences(SessionKeys.data_app.name(),Context.MODE_PRIVATE);
         editor=preferences.edit();
     }
 
@@ -29,8 +29,14 @@ public class SessionDatos {
         map.put(SessionKeys.idOperario, preferences.getString(SessionKeys.idOperario.name(), "0"));
         map.put(SessionKeys.horaInicio, preferences.getString(SessionKeys.horaInicio.name(), ""));
         map.put(SessionKeys.pesoTope, preferences.getString(SessionKeys.pesoTope.name(), "0"));
-
+        map.put(SessionKeys.empaqueRestaurant, preferences.getString(SessionKeys.empaqueRestaurant.name(), "0"));
         return  map;
+    }
+
+    public void enableEmpaqueRestaurant(String id){
+        //0 = EMPAQUE, 1 = EMPAQE RESTAURANT
+        editor.putString(SessionKeys.empaqueRestaurant.name(), id);
+        editor.commit();
     }
 
     public void IdRegistro(String registro){
@@ -79,13 +85,11 @@ public class SessionDatos {
 
     public boolean CheckPesa(){
         boolean isPesaOn;
-
         if(preferences.getBoolean(SessionKeys.pesaOn.name(),false)){
             isPesaOn = true;
         }else {
             isPesaOn = false;
         }
-
         return isPesaOn;
     }
 

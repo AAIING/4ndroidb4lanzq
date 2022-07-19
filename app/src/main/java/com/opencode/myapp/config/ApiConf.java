@@ -25,7 +25,8 @@ public class ApiConf {
         //Gson gson = new GsonBuilder().setLenient().create();
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
-                .serializeNulls().create();
+                .serializeNulls()
+                .create();
 
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)

@@ -32,12 +32,16 @@ import com.opencode.MainActivity;
 import com.opencode.myapp.Correcciones.Correcciones;
 import com.opencode.myapp.Empresas.Empresas;
 import com.opencode.myapp.Models.Capturas;
+import com.opencode.myapp.Models.Itemsid;
 import com.opencode.myapp.Models.Login;
+import com.opencode.myapp.Models.Pedidosd;
 import com.opencode.myapp.R;
 import com.opencode.myapp.Productos.Productos;
 import com.opencode.myapp.bdsqlite.DBDatos;
 import com.opencode.myapp.bdsqlite.DBMetodos;
 import com.opencode.myapp.config.ApiConf;
+import com.opencode.myapp.config.itext.TicketDoc;
+import com.opencode.myapp.config.itext.TicketEmpaqRestaurantDoc;
 import com.opencode.myapp.config.session.SessionDatos;
 import com.opencode.myapp.config.session.SessionKeys;
 
@@ -46,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import WebServices.wsSincroniza;
@@ -58,7 +63,10 @@ import retrofit2.Response;
 
 public class FEmpresas extends Fragment {
 
-    private Button btn_opcion1, btn_empacador;
+    //
+    public static final String ID_EMPAQUE_RESTAURANT_KEY = "emprest_key";
+
+    private Button btn_opcion1, btn_empacador, btn_empaquerestaurant;
     private Button btn_opcion2;
     private Button btn_correcciones;
     private Button btn_sincronizar;
@@ -67,8 +75,9 @@ public class FEmpresas extends Fragment {
     private List<Capturas> listadecapturas=new ArrayList<>();
     private String idsinc;
     private SessionDatos sessionDatos;
-
-
+    private TicketEmpaqRestaurantDoc ticketEmpaqRestaurantDoc;
+    private TicketDoc ticketDoc;
+    private List<Itemsid> listItems = new ArrayList<>();
 
     public FEmpresas() {
         // Required empty public constructor
@@ -84,14 +93,14 @@ public class FEmpresas extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_empresas, container, false);
 
+        ticketEmpaqRestaurantDoc = new TicketEmpaqRestaurantDoc(getContext());
+        ticketDoc = new TicketDoc(getContext());
         DBMetodos dbm = new DBMetodos(getContext());
         SQLiteDatabase db = dbm.getReadableDatabase();
         idsinc = String.valueOf(dbm.ObtieneIDSincronizado());
@@ -105,6 +114,8 @@ public class FEmpresas extends Fragment {
         btn_sincronizar.setText("("+idsinc+")"+"SINCRONIZACION");
         btn_reiniciasinc=view.findViewById(R.id.btn_reiniciasinc);
         btn_volver=view.findViewById(R.id.btn_volver);
+        btn_empaquerestaurant=view.findViewById(R.id.btn_opcion_empacador_restaurant);
+        btn_empaquerestaurant.setOnClickListener(onClickEmpaqueRestaurant);
 
         btn_opcion1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -215,6 +226,42 @@ public class FEmpresas extends Fragment {
         btn_reiniciasinc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /*
+                List<Pedidosd> pedidosdList = new ArrayList<>();
+                Pedidosd item = new Pedidosd();
+                pedidosdList.add(item);
+                ticketEmpaqRestaurantDoc.openDocument(
+                        "FECHAELAB",
+                        0,
+                        pedidosdList,
+                        true,
+                        1,
+                        1,
+                        "00000", //id detalle
+                        "r4", // id pedido
+                        "r7",//comuna
+                        "r10",//condominio
+                        "r2", //nombre cliente
+                        "r8");
+                String url_path2 = ticketDoc.getPathFile();
+                String shortuid = UUID.randomUUID().toString().replace("-","").substring(0,8);
+                Log.e("UUID--->", shortuid);
+                ticketDoc.openDocument(
+                        "",
+                        "",
+                        false,
+                        2,
+                        0,
+                        "r1", //id detalle
+                        "r4", // id pedido
+                        "r7",//comuna
+                        "r10",//condominio
+                        "r2", //nombre cliente
+                        "r8"); //direccion
+                String url_path2 = ticketDoc.getPathFile();
+                //pdfFile = new File(url_path2);
+                listItems = ticketDoc.getListItems();
+                //
                 AlertDialog.Builder dialogo1 = new AlertDialog.Builder(getContext());
                 dialogo1.setTitle("Importante");
                 dialogo1.setMessage("¿Esta seguro de reiniciar sincronizado?");
@@ -230,10 +277,11 @@ public class FEmpresas extends Fragment {
                 });
                 dialogo1.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogo1, int id) {
-                      //  cancelar();
+                        //  cancelar();
                     }
                 });
                 dialogo1.show();
+                */
             }
         });
 
@@ -292,15 +340,24 @@ public class FEmpresas extends Fragment {
         @Override
         public void onClick(View v) {
             EmpacadorFragment newFragment = new EmpacadorFragment();
-            //Bundle bundle = new Bundle();
-            //bundle.putString(REGISTRO_DETALLE_KEY, String.valueOf(item.getRegistro()));
-            //newFragment.setArguments(bundle);
+            //0 = EMPAQUE, 1 = EMPAQE RESTAURANT
+            sessionDatos.enableEmpaqueRestaurant("0");
             FragmentTransaction fm = getActivity().getSupportFragmentManager().beginTransaction();
             fm.replace(R.id.frame_empresas, newFragment);
             fm.commit();
         }
     };
 
+    private View.OnClickListener onClickEmpaqueRestaurant = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            EmpacadorFragment newFragment = new EmpacadorFragment();
+            sessionDatos.enableEmpaqueRestaurant("1");
+            FragmentTransaction fm = getActivity().getSupportFragmentManager().beginTransaction();
+            fm.replace(R.id.frame_empresas, newFragment);
+            fm.commit();
+        }
+    };
 
     public class Sincronizar extends  AsyncTask<Void, Void, String> {
 

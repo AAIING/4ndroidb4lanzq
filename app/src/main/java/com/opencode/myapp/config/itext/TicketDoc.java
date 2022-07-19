@@ -1,5 +1,8 @@
 package com.opencode.myapp.config.itext;
 
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.WHITE;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -7,6 +10,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.util.Log;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.common.BitMatrix;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
@@ -17,13 +23,16 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.opencode.myapp.Models.Itemsid;
 import com.opencode.myapp.Models.Pedidosd;
+import com.opencode.myapp.Models.Presentaciones;
 import com.opencode.myapp.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TicketDoc {
@@ -38,9 +47,10 @@ public class TicketDoc {
     private Font BLACK_BOLD = new Font(Font.FontFamily.HELVETICA,48, Font.BOLD, BaseColor.BLACK);
     private Font BLACK_BOLD_TITULOS = new Font(Font.FontFamily.HELVETICA,44, Font.BOLD, BaseColor.BLACK);
     private ParagraphBorder paragraphBorder;
-    private String pathFile, npedido="",tpedido="",comuna="",nomcliente="",direccion="", condominio="", tiempoIngreso="";
+    private String pathFile, npedido="",tpedido="",comuna="",nomcliente="",direccion="", condominio="", tiempoIngreso="", codigouid="", uidentrada="";
     private int cajas=1, bolsas=0;
     private boolean fragil = false, ticketIngreso = false;
+    private List<Itemsid> listItems = new ArrayList<>();
 
     public TicketDoc(Context context) {
         this.context = context;
@@ -51,20 +61,21 @@ public class TicketDoc {
     }
 
     public void openDocument(
-            String tiempoIngreso,
-                            //boolean ticketIngreso,
-                            boolean fragil,
-                            int cajas,
-                             int bolsas,
-                             String npedido,
-                             String tpedido,
-                             String comuna,
-                             String condominio,
-                             String nomcliente,
-                             String direccion){
-
+                        String uidentrada,
+                        String codigouid,
+                        String tiempoIngreso,
+                        boolean fragil,
+                        int cajas,
+                        int bolsas,
+                        String npedido,
+                        String tpedido,
+                        String comuna,
+                        String condominio,
+                        String nomcliente,
+                        String direccion){
+        this.uidentrada = uidentrada;
+        this.codigouid = codigouid;
         this.tiempoIngreso = tiempoIngreso;
-        //this.ticketIngreso = ticketIngreso;
         this.fragil = fragil;
         this.cajas=cajas;
         this.bolsas=bolsas;
@@ -74,13 +85,12 @@ public class TicketDoc {
         this.condominio=condominio;
         this.nomcliente=nomcliente;
         this.direccion=direccion;
-
         /***/
         String nomDoc;
         if(!tiempoIngreso.equals("")) {
-             nomDoc = "TicketIngreso-PedidoN°-"+npedido+"-"+tiempoIngreso+".pdf";
+             nomDoc = "Ticket_Ingreso_PedidoN°"+npedido+".pdf";
         }else{
-            nomDoc = "Ticket-" + UUID.randomUUID().toString() + ".pdf";
+            nomDoc = "Ticket_PedidoN°" +npedido+ ".pdf";
         }
         File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         //pdfFile = new File (folder + "/" + nomDoc);
@@ -92,25 +102,47 @@ public class TicketDoc {
             paragraphBorder = new ParagraphBorder();
             pdfWriter.setPageEvent(paragraphBorder);
             document.open();
-            /***/
-            if(cajas >= 1) {
-                for (int i = 1; i <= cajas; i++) {
+
+            //CODIGO UUID PARA TICKET INGRESO PRIMERO IMPRIME, AL CERRAR PEDIDO SE ENVIA CODIGO DE TICKET INGRESO
+            if(uidentrada.isEmpty()) {
+                Itemsid itemsid = new Itemsid();
+                itemsid.setCodigo(codigouid);
+                itemsid.setTipoitem("CAJA");
+                itemsid.setPedidosregistro(Integer.parseInt(npedido));
+                listItems.add(itemsid);
+            }else{
+                //TICKET INGRESO SOLO PARA IMPRIMIR
+                for (int i = 1; i == 1; i++) {
                     docContent(i,cajas, 2);
+                    document.newPage();
+                }
+            }
+
+            /**TICKET DE SALIDA O CIERRE*/
+            if(cajas > 1) {
+                for (int i = 1; i <= cajas-1; i++) {
+                    docContent(i,cajas, 2);
+                    document.newPage();
                 }
             }
 
             if(bolsas >= 1) {
                 for (int i = 1; i <= bolsas; i++) {
                     docContent(i,bolsas, 1);
+                    document.newPage();
                 }
             }
 
             document.close();
+
         }catch (Exception e){
             Log.e("openDocument",e.toString());
         }
     }
 
+    public List<Itemsid> getListItems(){
+        return listItems;
+    }
 
     void docContent(int index, int totalcajobol, int tipocajobol){
         //
@@ -127,7 +159,7 @@ public class TicketDoc {
                 Image imageLogo = Image.getInstance(stream1.toByteArray());
 
                 cell = new PdfPCell();
-                cell.setBorder(Rectangle.NO_BORDER);
+                cell.setBorder(Rectangle.LEFT | Rectangle.TOP);
 
                 cellImg = new PdfPCell(imageLogo, true);
                 cellImg.setBorder(Rectangle.NO_BORDER);
@@ -160,10 +192,8 @@ public class TicketDoc {
                 }
 
                 cell.addElement(subTable3);
-                cell.setBorder(Rectangle.NO_BORDER);
-
+                cell.setBorder(Rectangle.RIGHT | Rectangle.TOP);
                 table.addCell(cell);
-
                 document.add(table);
 
                 /***/
@@ -171,31 +201,97 @@ public class TicketDoc {
                 subTable3.setWidthPercentage(anchopagina);
                 subTable3.setWidthPercentage(100);
 
-                subTable3.addCell(createCellA("Comuna:"));
+                cell = new PdfPCell(new Phrase("Comuna:", BLACK_BOLD_TITULOS));
+                cell.setBorder(Rectangle.LEFT);
+                //subTable3.addCell(createCellA("Comuna:"));
+                subTable3.addCell(cell);
+
+
                 cell = new PdfPCell(new Phrase(comuna, BLACK_BOLD));
                 cell.setColspan(2);
-                cell.setBorder(Rectangle.NO_BORDER);
+                cell.setBorder(Rectangle.RIGHT);
                 subTable3.addCell(cell);
 
-                subTable3.addCell(createCellA("Condominio:"));
+                cell = new PdfPCell(new Phrase("Condominio:", BLACK_BOLD_TITULOS));
+                cell.setBorder(Rectangle.LEFT);
+                //subTable3.addCell(createCellA("Condominio:"));
+                subTable3.addCell(cell);
+
                 cell = new PdfPCell(new Phrase(condominio, BLACK_BOLD));
                 cell.setColspan(2);
-                cell.setBorder(Rectangle.NO_BORDER);
+                cell.setBorder(Rectangle.RIGHT);
                 subTable3.addCell(cell);
 
-                subTable3.addCell(createCellA("Dirección:"));
+
+                cell = new PdfPCell(new Phrase("Dirección:", BLACK_BOLD_TITULOS));
+                cell.setBorder(Rectangle.LEFT);
+                //subTable3.addCell(createCellA("Dirección:"));
+                subTable3.addCell(cell);
+
                 cell = new PdfPCell(new Phrase(direccion, BLACK_BOLD));
                 cell.setColspan(2);
-                cell.setBorder(Rectangle.NO_BORDER);
+                cell.setBorder(Rectangle.RIGHT);
                 subTable3.addCell(cell);
 
-                subTable3.addCell(createCellA("Cliente:"));
+                cell = new PdfPCell(new Phrase("Cliente:", BLACK_BOLD_TITULOS));
+                cell.setBorder(Rectangle.LEFT);
+                //subTable3.addCell(createCellA("Cliente:"));
+                subTable3.addCell(cell);
+
                 cell = new PdfPCell(new Phrase(nomcliente, BLACK_BOLD));
                 cell.setColspan(2);
-                cell.setBorder(Rectangle.NO_BORDER);
+                cell.setBorder(Rectangle.RIGHT);
+                subTable3.addCell(cell);
+
+                /***/
+                cell = new PdfPCell(new Phrase(" ", BLACK_BOLD_TITULOS));
+                cell.setBorder(Rectangle.LEFT | Rectangle.BOTTOM);
+                //subTable3.addCell(createCellA("Cliente:"));
+                cell.setPaddingTop(40);
+                cell.setPaddingBottom(100);
+                subTable3.addCell(cell);
+
+                cell = new PdfPCell(new Phrase(" ", BLACK_BOLD));
+                cell.setColspan(2);
+                cell.setBorder(Rectangle.RIGHT | Rectangle.BOTTOM);
+                cell.setPaddingTop(40);
+                cell.setPaddingBottom(100);
                 subTable3.addCell(cell);
 
                 document.add(subTable3);
+
+                String shortuid = UUID.randomUUID().toString().replace("-","").substring(0,8);
+                Itemsid itemsid = new Itemsid();
+
+                if(tipocajobol > 1) {
+                    //subTable3.addCell(createCellA("Caja:"));
+                    //subTable3.addCell(createCellA(index + "/" + totalcajobol));
+                    itemsid.setCodigo(shortuid);
+                    itemsid.setTipoitem("CAJA");
+                    itemsid.setPedidosregistro(Integer.parseInt(npedido));
+                } else {
+                    itemsid.setCodigo(shortuid);
+                    itemsid.setTipoitem("BOLSA");
+                    itemsid.setPedidosregistro(Integer.parseInt(npedido));
+                    //subTable3.addCell(createCellA("Bolsa:"));
+                    //subTable3.addCell(createCellA(index + "/" + totalcajobol));
+                }
+
+                listItems.add(itemsid);
+                Bitmap bitmapqr = null;
+
+                //SI CODIGOUID = VACIO.. VIENE CON UID ENTRADA PARA SOLO IMPRIMIR QR
+                if(codigouid.isEmpty()) {
+                    bitmapqr = createBitmap(uidentrada);
+                }else{
+                    bitmapqr = createBitmap(shortuid);
+                }
+
+                ByteArrayOutputStream stream3 = new ByteArrayOutputStream();
+                bitmapqr.compress(Bitmap.CompressFormat.PNG, 100, stream3);
+                Image imageQr = Image.getInstance(stream3.toByteArray());
+                imageQr.setAbsolutePosition(650, 20);
+                document.add(imageQr);
 
                 if(fragil) {
                     //LOGO FRAGIL
@@ -205,15 +301,15 @@ public class TicketDoc {
                     bitDwLogo2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
                     Image imageLogo2 = Image.getInstance(stream2.toByteArray());
                     /**POSICION IMAGEN*/
-                    imageLogo2.setAbsolutePosition(650, 150);
+                    imageLogo2.setAbsolutePosition(350, 20);
                     /**TAMAÑO IMAGEN*/
                     imageLogo2.scaleAbsolute(145f, 145f);
                     document.add(imageLogo2);
                 }
 
-                document.newPage();
+                //document.newPage();
 
-        } catch (Exception  e) {
+        } catch(Exception e) {
             Log.e("titulo_documento",e.toString());
         }
     }
@@ -222,6 +318,28 @@ public class TicketDoc {
         PdfPCell cell = new PdfPCell(new Phrase(content, BLACK_BOLD_TITULOS));
         cell.setBorder(Rectangle.NO_BORDER);
         return cell;
+    }
+
+    private Bitmap createBitmap(String text){
+        BitMatrix result;
+        try{
+            result = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, 150, 150, null);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        int width = result.getWidth();
+        int height = result.getHeight();
+        int[] pixels = new int[width*height];
+        for(int x=0; x<height; x++){
+            int offset = x* width;
+            for(int k=0; k<width; k++){
+                pixels[offset+k] = result.get(k, x) ? BLACK : WHITE;
+            }
+        }
+        Bitmap myBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        myBitmap.setPixels(pixels,0,width,0,0,width,height);
+        return myBitmap;
     }
 
 }

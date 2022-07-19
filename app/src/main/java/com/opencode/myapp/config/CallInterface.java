@@ -1,6 +1,7 @@
 package com.opencode.myapp.config;
 
 import com.google.gson.JsonObject;
+import com.opencode.myapp.Models.Itemsid;
 import com.opencode.myapp.Models.Login;
 import com.opencode.myapp.Models.Operarios;
 import com.opencode.myapp.Models.Parametros;
@@ -21,6 +22,7 @@ import retrofit2.http.Body;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
@@ -47,7 +49,8 @@ public interface CallInterface {
                          @Query("idsesion") int idsesion);
 
     @GET("api/pedidos/pendientes")
-    Observable<List<Pedidos>> getPedidosPendientes(@Query("idoperario") int idoperario);
+    Observable<List<Pedidos>> getPedidosPendientes(@Query("idoperario") int idoperario,
+                                                   @Query("empaqrestaurant") int empaqrestaurant);
 
     @GET("api/pedidos/parametros")
     Observable<Parametros> getParametros();
@@ -69,6 +72,9 @@ public interface CallInterface {
     Call<Pedidosd> postPedidod(@Query("registro") int registro,
                                @Query("codigo") int codigo,
                                @Body RequestBody body);
+
+    @POST("api/pedidos/itemspedido")
+    Call<Itemsid> postItemsPedido(@Body RequestBody body);
 
 
 }

@@ -28,6 +28,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
@@ -56,6 +57,7 @@ import com.opencode.myapp.Models.Pedidosd;
 import com.opencode.myapp.Models.Sesiones;
 import com.opencode.myapp.Models.Vendedores;
 import com.opencode.myapp.R;
+import com.opencode.myapp.bdsqlite.ItemsidData;
 import com.opencode.myapp.config.ApiConf;
 import com.opencode.myapp.config.CallInterface;
 import com.opencode.myapp.config.itext.TicketDoc;
@@ -119,19 +121,14 @@ public class EmpacadorFragment extends Fragment {
     private ProgressDialog progressDialog;
     private AlertDialog alertDialog;
     private SessionDatos sessionDatos;
-    private int idvendedor =0,idsesionempaque=0,idoperario=0, numpedidopausado =0;
+    private int idvendedor=0,idsesionempaque=0,idoperario=0,numpedidopausado=0,empaqerestaurant=0;
     private Sesiones sesiones;
     private TextView viewTiempoInicio, viewBackNav, viewTituloBar, viewBandaInfo;
-    //private String fechaPedido="";
     private TicketDoc ticketDoc;
-    //private Timer timercount;
     private Handler handler = new Handler();
     private Runnable runnable;
-
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private CallInterface callInterface;
-    //private Disposable disposable;
-    //
     private String ConnectType="";
     private UsbManager mUsbManager=null;
     private UsbDevice device=null;
@@ -241,21 +238,24 @@ public class EmpacadorFragment extends Fragment {
         }
     };
 
+
+    private ItemsidData itemsidData;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        itemsidData = new ItemsidData(getContext());
         sessionDatos = new SessionDatos(getContext());
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         View view = inflater.inflate(R.layout.fragment_empacador, container, false);
-
         //IMPRESORA
         mPermissionIntent = PendingIntent.getBroadcast(getContext(), 0, new Intent(ACTION_USB_PERMISSION), 0);
         IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         getContext().registerReceiver(mUsbReceiver, filter);
         zplPrinterHelper = ZPLPrinterHelper.getZPL(getContext());
         conectaImpresoraUSB();
-
+        empaqerestaurant = Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.empaqueRestaurant));
         alertDialog = new AlertDialog.Builder(getContext()).create();
         progressDialog = new ProgressDialog(getContext());
         recyclerView = view.findViewById(R.id.recycler_list_empaca);
@@ -275,9 +275,8 @@ public class EmpacadorFragment extends Fragment {
         //
         Retrofit retrofit = ApiConf.getRetrofit();
         callInterface = retrofit.create(CallInterface.class);
-
         compositeDisposable.add(Observable.interval(3, TimeUnit.SECONDS)
-                .flatMap(n -> callInterface.getPedidosPendientes(idoperario))
+                .flatMap(n -> callInterface.getPedidosPendientes(idoperario, empaqerestaurant))
                 .repeat()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -287,7 +286,6 @@ public class EmpacadorFragment extends Fragment {
                         loadListEmpacador(pedidos);
                     }
                 }, this::onError));
-
         compositeDisposable.add(Observable.interval(3, TimeUnit.SECONDS)
                 .flatMap(n -> callInterface.getParametros())
                 .repeat()
@@ -300,7 +298,6 @@ public class EmpacadorFragment extends Fragment {
                         sessionDatos.setPesoTope(String.valueOf(result.getPesoTope()));
                     }
                 }, this::onError));
-
         return view;
     }
 
@@ -310,11 +307,9 @@ public class EmpacadorFragment extends Fragment {
 
     @Override
     public void onStop() {
-        //
         compositeDisposable.clear();
         super.onStop();
     }
-
 
     void loadListEmpacador(List<Pedidos> pedidos){
         /***/
@@ -328,45 +323,36 @@ public class EmpacadorFragment extends Fragment {
             }
         }
 
-
         empacadorRecyclerAdapter = new EmpacadorRecyclerAdapter(getContext(), pedidos);
         empacadorRecyclerAdapter.setOnClickListener(new EmpacadorRecyclerAdapter.OnClickListener() {
             @Override
             public void onEditar(View view, int position) {
                 Pedidos item = pedidos.get(position);
-
                 Vendedores item_vend ;
                 Clientes item_cl = item.getClientes();
-
                 progressDialog.setCancelable(false);
                 progressDialog.setMessage("Ingresando a pedido..");
                 progressDialog.show();
-
                 String tipopedido = "";
                 String categoria = "";
-
                 if(item.isWeb()){
                     tipopedido = "WWW";
                 } else {
                     tipopedido = "VENDEDOR";
                 }
-
                 if(item_cl.getCategoria().equals("1")){
                     categoria = "STANDAR";
                 } else if(item_cl.getCategoria().equals("2")){
                     categoria = "PREMIUM";
                 }
-
                 if(item.getVendedores() == null){
                     Vendedores item_vend2 = new Vendedores();
                     item_vend2.setNombre("SIN VENDEDOR");
                     pedidos.get(position).setVendedores(item_vend2);
                     item_vend = item.getVendedores();
-
                 }else{
                     item_vend = item.getVendedores();
                 }
-
                 getSesionEmpaque(
                         item.getPedidopausa(),
                         item.getCantcomanda(),
@@ -379,7 +365,7 @@ public class EmpacadorFragment extends Fragment {
                         item_vend.getNombre(),
                         tipopedido,
                         item.getFecha(),
-                        item.getCondominioenvio(),
+                        item.getComunaenvio(),
                         item.getCondominioenvio(),
                         item.getDireccionenvio(),
                         categoria);
@@ -392,7 +378,6 @@ public class EmpacadorFragment extends Fragment {
     private View.OnClickListener onClickBackNav = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //
             alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.setTitle("Finalizar Turno");
             alertDialog.setMessage("¿Desea finalizar turno?");
@@ -400,35 +385,32 @@ public class EmpacadorFragment extends Fragment {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     alertDialog.dismiss();
-
                     Call<Login> call = ApiConf.getData().getLogSesion(
                             Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idOperario)),
                             Integer.parseInt(sessionDatos.getRecord().get(SessionKeys.idSesion)));
                     call.enqueue(new Callback<Login>() {
                         @Override
                         public void onResponse(Call<Login> call, Response<Login> response) {
-                            if(response.isSuccessful())
-                            {
-                            /*
-                            Login login = response.body();
-                            sessionDatos.setLogin(login.getNombre(),
-                                    String.valueOf(login.getVendedor()),
-                                    String.valueOf(login.getIdSesion()));
-                             */
+                            if(response.isSuccessful()) {
+                                sessionDatos.cleanSesion();
+                                File folder3 = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                                if (folder3.exists()) {
+                                    File[] Files = folder3.listFiles();
+                                    if (Files != null) {
+                                        for (int j = 0; j < Files.length; j++) {
+                                            //
+                                            Files[j].delete();
+                                        }
+                                    }
+                                }
+                                //Log.e("OK--->", response.toString());
+                                Intent intent = new Intent(getContext(), MainActivity.class);
+                                startActivity(intent);
                             }
-
-                            Intent intent = new Intent(getContext(), MainActivity.class);
-                            startActivity(intent);
-
-                            sessionDatos.cleanSesion();
-
-                            Log.e("OK--->", response.toString());
-
                         }
                         @Override
                         public void onFailure(Call<Login> call, Throwable t) {
                             Log.e("ERROR--->", t.toString());
-
                         }
                     });
                 }
@@ -437,16 +419,13 @@ public class EmpacadorFragment extends Fragment {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     alertDialog.dismiss();
-
                     FEmpresas newFragment = new FEmpresas();
                     FragmentTransaction fm = getActivity().getSupportFragmentManager().beginTransaction();
                     fm.replace(R.id.frame_empresas, newFragment);
                     fm.commit();
                 }
             });
-
             alertDialog.show();
-
         }
     };
 
@@ -472,48 +451,49 @@ public class EmpacadorFragment extends Fragment {
             public void onResponse(Call<Sesiones> call, Response<Sesiones> response) {
                 if (response.isSuccessful()) {
                     Sesiones sesiones = response.body();
-
+                    String shortuid = "";
                     if (pedidopausa == 0) {
-                        ticketDoc.openDocument(
-                                sesiones.getFechaInicio() + " " + sesiones.getHoraInicio(),
-                                false,
-                                1,
-                                0,
-                                String.valueOf(registro), //id detalle
-                                tipopedido, // id pedido
-                                comuna,//comuna
-                                condominio,//condominio
-                                nomCliente, //nombre cliente
-                                direccion); //direccion
-
-                        String file_path = ticketDoc.getPathFile();
-                        File pdfFile = new File(file_path);
-                        progressDialog.setMessage("Imprimiendo..");
-                        progressDialog.show();
-                        List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                //do in background
-                                try {
-                                    //
-                                    for (Bitmap bmp : list_bitmap) {
-                                        zplPrinterHelper.start();
-                                        zplPrinterHelper.printBitmap("60", "60", bmp);
-                                        zplPrinterHelper.end();
+                        File pdfFile = null;
+                        if(sessionDatos.getRecord().get(SessionKeys.empaqueRestaurant).equals("0")){
+                            shortuid = UUID.randomUUID().toString().replace("-","").substring(0,8);
+                            ticketDoc.openDocument(
+                                    shortuid, //PASA PARA GENERAR EL TICKET CON EL SHORTUID DE ENTRADA
+                                    "",
+                                    sesiones.getFechaInicio() + " " + sesiones.getHoraInicio(),
+                                    false,
+                                    1,
+                                    0,
+                                    String.valueOf(registro), //id detalle
+                                    tipopedido, // id pedido
+                                    comuna,//comuna
+                                    condominio,//condominio
+                                    nomCliente, //nombre cliente
+                                    direccion); //direccion
+                            String file_path = ticketDoc.getPathFile();
+                            pdfFile = new File(file_path);
+                            progressDialog.setMessage("Imprimiendo..");
+                            progressDialog.show();
+                            List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //do in background
+                                    try {
+                                        //
+                                        for (Bitmap bmp : list_bitmap) {
+                                            zplPrinterHelper.start();
+                                            zplPrinterHelper.printBitmap("60", "60", bmp);
+                                            zplPrinterHelper.end();
+                                        }
+                                        progressDialog.dismiss();
+                                    } catch (Exception e) {
+                                        progressDialog.dismiss();
                                     }
-                                    progressDialog.dismiss();
-                                } catch (Exception e) {
-                                    progressDialog.dismiss();
                                 }
-                            }
-                        }).start();
-
-                        Toast.makeText(getContext(), "Ticket Ingreso N°Pedido " + String.valueOf(registro) + " Generado..", Toast.LENGTH_LONG).show();
-
+                            }).start();
+                            Toast.makeText(getContext(), "Ticket Ingreso N°Pedido " + String.valueOf(registro) + " Generado..", Toast.LENGTH_LONG).show();
+                        }
                     }
-
                     //
                     DetalleFragment newFragment = new DetalleFragment();
                     Bundle bundle = new Bundle();
@@ -530,9 +510,8 @@ public class EmpacadorFragment extends Fragment {
                     bundle.putString(CANTIDAD_COMANDA_KEY, String.valueOf(cantcomanda));
                     bundle.putString(NUM_PEDIDO_PAUSA_KEY, String.valueOf(numpedidopausado));
                     bundle.putString(PEDIDO_PAUSADO_KEY, String.valueOf(pedidopausa));
-
+                    bundle.putString("CODIGO_UUID", shortuid); //PASA PARA GUARDARLO EN LA LISTA
                     newFragment.setArguments(bundle);
-
                     FragmentTransaction fm = getActivity().getSupportFragmentManager().beginTransaction();
                     fm.replace(R.id.frame_empresas, newFragment);
                     fm.commit();
@@ -549,44 +528,29 @@ public class EmpacadorFragment extends Fragment {
     }
 
     private  ArrayList<Bitmap> pdfToBitmap(File pdfFile) {
-
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
-
         try {
             PdfRenderer renderer = new PdfRenderer(ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY));
-
             Bitmap bitmap;
-
             final int pageCount = renderer.getPageCount();
-
             for (int i = 0; i < pageCount; i++) {
-
                 PdfRenderer.Page page = renderer.openPage(i);
-
                 int width = getResources().getDisplayMetrics().densityDpi / 72 * page.getWidth();
                 int height = getResources().getDisplayMetrics().densityDpi / 72 * page.getHeight();
-
                 bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
                 Canvas canvas = new Canvas(bitmap);
                 canvas.drawColor(Color.WHITE);
                 canvas.drawBitmap(bitmap, 0, 0, null);
-
                 page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-
                 bitmaps.add(getResizedBitmap(bitmap, 750, 750));
-
                 // close the page
                 page.close();
-
             }
-
             // close the renderer
             renderer.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         return bitmaps;
     }
 
