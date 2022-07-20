@@ -245,7 +245,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
         viewBackNav.setOnClickListener(onClickBackNav);
         viewTituloBar.setText("Cliente: ??");
         viewMenu = view.findViewById(R.id.view_det_menu);
-        //viewMenu.setOnClickListener(onClickMenu);
+        viewMenu.setOnClickListener(onClickMenu);
         viewColTara = view.findViewById(R.id.view_col_tara);
         viewColPsjeTotal = view.findViewById(R.id.view_col_psje_total);
         viewColPesaje = view.findViewById(R.id.view_col_pesaje);
@@ -276,7 +276,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             if(getArguments().getString(CONDOMINIO_CLIENTE_KEY) != null) {
                 r10 = getArguments().getString(CONDOMINIO_CLIENTE_KEY).toUpperCase(Locale.ROOT);
             }else{
-                r10="SIN DECLARAR";
+                r10="";
             }
             cantcomanda = Integer.parseInt(getArguments().getString(CANTIDAD_COMANDA_KEY));
             sessionDatos.IdRegistro(r1);
@@ -467,7 +467,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
 
         }
     };
- /*
+
     private View.OnClickListener onClickMenu = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -479,6 +479,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 public boolean onMenuItemClick(MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.item_gen_comanda:
+                            /*
                             if(cantcomanda >= 1) {
                                 alertDialog.setCanceledOnTouchOutside(false);
                                 alertDialog.setTitle("Generar Comanda N°: "+(cantcomanda + 1));
@@ -544,36 +545,43 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                     }
                                 });
                             }
+                            */
                             return true;
                         case R.id.item_gen_etiqueta:
                             bolsas = 0;
-                            cajas = 0;
+                            cajas = 1;
                             if (!editCajas.getText().toString().isEmpty()) {
-                                cajas = Integer.parseInt(editCajas.getText().toString());
+                                cajas = cajas + Integer.parseInt(editCajas.getText().toString());
                             }
                             if (!editBolsas.getText().toString().isEmpty()) {
                                 bolsas = Integer.parseInt(editBolsas.getText().toString());
                             }
-                            if (bolsas == 0 && cajas == 0) {
+
+                            if (bolsas == 0 && cajas == 1) {
                                 alertRango("Empaque", "Debe especificar al menos una (1) Bolsa o Caja.");
                                 return false;
                             }
 
                             //
                             ticketDoc.openDocument(
-                                    coduid,
+                                    "",
+                                    "codigouid",
                                     "",
                                     fragil,
                                     cajas,
                                     bolsas,
                                     r1, //id detalle
                                     r4, // id pedido
-                                    r7,//comuna
-                                    r10,//condominio
-                                    r2, //nombre cliente
-                                    r8); //direccion
+                                    r7.toUpperCase(Locale.ROOT),//comuna
+                                    r10.toUpperCase(Locale.ROOT),//condominio
+                                    r2.toUpperCase(Locale.ROOT), //nombre cliente
+                                    r8.toUpperCase(Locale.ROOT)); //direccion
                             String url_path2 = ticketDoc.getPathFile();
                             File pdfFile = new File(url_path2);
+
+                            //listItems.addAll(ticketDoc.getListItems());
+                            listItems = ticketDoc.getListItems();
+
                             progressDialog.setMessage("Imprimiendo..");
                             progressDialog.show();
                             List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
@@ -584,7 +592,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                     try{
                                         for(Bitmap bmp: list_bitmap) {
                                             zplPrinterHelper.start();
-                                            zplPrinterHelper.printBitmap("60", "60", bmp);
+                                            zplPrinterHelper.printBitmap("50", "50", bmp);
                                             zplPrinterHelper.end();
                                         }
                                         progressDialog.dismiss();
@@ -595,9 +603,13 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             }.start();
                             Toast.makeText(getContext(), "Ticket Generado", Toast.LENGTH_LONG).show();
                             listItems = ticketDoc.getListItems();
+                            //
+                            editCajas.setText("");
+                            editBolsas.setText("");
                           return true;
 
                         case R.id.item_gen_com_etq:
+                            /*
                             bolsas = 0;
                             cajas = 0;
                             if(!editCajas.getText().toString().isEmpty()){
@@ -606,12 +618,10 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             if(!editBolsas.getText().toString().isEmpty()){
                                 bolsas = Integer.parseInt(editBolsas.getText().toString());
                             }
-
                             if(bolsas == 0 && cajas == 0){
                                 alertRango("Empaque","Debe especificar al menos una (1) Bolsa o Caja.");
                                 return false;
                             }
-
                             ticketComandaDoc.openDocument(
                                     fragil,
                                     cajas,
@@ -628,6 +638,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                     r8);
                             String url_path3 = ticketComandaDoc.getPathFile();
                             Toast.makeText(getContext(), "Ticket y Comanda Generada", Toast.LENGTH_LONG).show();
+                            */
                             return true;
                         default:
                           return false;
@@ -637,7 +648,8 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             popupMenu.show();
         }
     };
-*/
+
+
     private View.OnClickListener onClickGuardarDet = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -655,7 +667,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                             " de pesaje establecido.\nEste debe ser mayor.");
                             return;
                         }
-
                         if (item_pedidod.getCantidadreal() >= item_pedidod.getMaxPeso()) {
                             alertRango("Cantidad Real mayor al rango de pesaje",
                                     "El código: " + item_pedidod.getCodigo() + " es mayor al rango: " + fd.format(item_pedidod.getMaxPeso()) +
@@ -774,6 +785,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     1,
                     0);
         }
+
     }
 
     private View.OnClickListener onClickBackNav = new View.OnClickListener() {
@@ -994,7 +1006,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     File pdfFile = null;
                     /**IMPRIME TICKET RESTAURANT*/
                     if(sessionDatos.getRecord().get(SessionKeys.empaqueRestaurant).equals("1")){
-                        //
                         ticketEmpaqRestaurantDoc.openDocument(
                                 r9, //CATEG.CLIENTE
                                 result.getFechaelab(),
@@ -1017,6 +1028,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     else
                     {
                         //
+                        /*
                         if(cajas > 1 || bolsas > 0) {
                             ticketDoc.openDocument(
                                     "",
@@ -1042,6 +1054,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             itemsid.setPedidosregistro(Integer.parseInt(r1));
                             listItems.add(itemsid);
                         }
+                        */
                     }
                     //
                     progressDialog.setMessage("Imprimiendo..");
@@ -1055,7 +1068,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                 //
                                 for (Bitmap bmp : list_bitmap) {
                                     zplPrinterHelper.start();
-                                    zplPrinterHelper.printBitmap("60", "60", bmp);
+                                    zplPrinterHelper.printBitmap("50", "50", bmp);
                                     zplPrinterHelper.end();
                                 }
                                 progressDialog.dismiss();

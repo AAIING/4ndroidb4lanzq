@@ -44,8 +44,8 @@ public class TicketDoc {
     private File pdfFile;
     private Document document;
     private PdfWriter pdfWriter;
-    private Font BLACK_BOLD = new Font(Font.FontFamily.HELVETICA,48, Font.BOLD, BaseColor.BLACK);
-    private Font BLACK_BOLD_TITULOS = new Font(Font.FontFamily.HELVETICA,44, Font.BOLD, BaseColor.BLACK);
+    private Font BLACK_BOLD = new Font(Font.FontFamily.HELVETICA,38, Font.BOLD, BaseColor.BLACK);
+    private Font BLACK_BOLD_TITULOS = new Font(Font.FontFamily.HELVETICA,28, Font.BOLD, BaseColor.BLACK);
     private ParagraphBorder paragraphBorder;
     private String pathFile, npedido="",tpedido="",comuna="",nomcliente="",direccion="", condominio="", tiempoIngreso="", codigouid="", uidentrada="";
     private int cajas=1, bolsas=0;
@@ -97,12 +97,11 @@ public class TicketDoc {
         pdfFile = new File (folder, nomDoc);
         pathFile = pdfFile.getPath();
         try{
-            document = new Document(new Rectangle(850,  650), 1, 1, 1, 1);
+            document = new Document(new Rectangle(700,  700), 5, 5, 5, 5);
             pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
             paragraphBorder = new ParagraphBorder();
             pdfWriter.setPageEvent(paragraphBorder);
             document.open();
-
             //CODIGO UUID PARA TICKET INGRESO PRIMERO IMPRIME, AL CERRAR PEDIDO SE ENVIA CODIGO DE TICKET INGRESO
             if(uidentrada.isEmpty()) {
                 Itemsid itemsid = new Itemsid();
@@ -147,7 +146,8 @@ public class TicketDoc {
     void docContent(int index, int totalcajobol, int tipocajobol){
         //
         try {
-                PdfPTable table;
+                PdfPTable table, subTable3;
+
                 table = new PdfPTable(4);
                 table.setWidthPercentage(anchopagina);
                 PdfPCell cell, cellImg, cellSolicitud;
@@ -175,7 +175,7 @@ public class TicketDoc {
                 cell = new PdfPCell();
                 cell.setColspan(3);
 
-                PdfPTable subTable3 = new PdfPTable(2);
+                subTable3 = new PdfPTable(2); //PdfPTable
                 subTable3.setWidthPercentage(anchopagina);
 
                 subTable3.addCell(createCellA("N° Pedido:"));
@@ -194,6 +194,7 @@ public class TicketDoc {
                 cell.addElement(subTable3);
                 cell.setBorder(Rectangle.RIGHT | Rectangle.TOP);
                 table.addCell(cell);
+
                 document.add(table);
 
                 /***/
@@ -203,59 +204,66 @@ public class TicketDoc {
 
                 cell = new PdfPCell(new Phrase("Comuna:", BLACK_BOLD_TITULOS));
                 cell.setBorder(Rectangle.LEFT);
+                cell.setPaddingBottom(5);
                 //subTable3.addCell(createCellA("Comuna:"));
                 subTable3.addCell(cell);
 
-
                 cell = new PdfPCell(new Phrase(comuna, BLACK_BOLD));
                 cell.setColspan(2);
+                cell.setPaddingBottom(5);
                 cell.setBorder(Rectangle.RIGHT);
                 subTable3.addCell(cell);
 
                 cell = new PdfPCell(new Phrase("Condominio:", BLACK_BOLD_TITULOS));
                 cell.setBorder(Rectangle.LEFT);
+                cell.setPaddingBottom(25);
                 //subTable3.addCell(createCellA("Condominio:"));
                 subTable3.addCell(cell);
 
+                //COND SANTA TERESITA DE LISEUX
                 cell = new PdfPCell(new Phrase(condominio, BLACK_BOLD));
                 cell.setColspan(2);
+                cell.setPaddingBottom(25);
                 cell.setBorder(Rectangle.RIGHT);
                 subTable3.addCell(cell);
 
-
                 cell = new PdfPCell(new Phrase("Dirección:", BLACK_BOLD_TITULOS));
                 cell.setBorder(Rectangle.LEFT);
+                cell.setPaddingBottom(20);
                 //subTable3.addCell(createCellA("Dirección:"));
                 subTable3.addCell(cell);
 
                 cell = new PdfPCell(new Phrase(direccion, BLACK_BOLD));
                 cell.setColspan(2);
+                cell.setPaddingBottom(20);
                 cell.setBorder(Rectangle.RIGHT);
                 subTable3.addCell(cell);
 
                 cell = new PdfPCell(new Phrase("Cliente:", BLACK_BOLD_TITULOS));
                 cell.setBorder(Rectangle.LEFT);
+                cell.setPaddingBottom(50);
                 //subTable3.addCell(createCellA("Cliente:"));
                 subTable3.addCell(cell);
 
                 cell = new PdfPCell(new Phrase(nomcliente, BLACK_BOLD));
                 cell.setColspan(2);
                 cell.setBorder(Rectangle.RIGHT);
+                cell.setPaddingBottom(20);
                 subTable3.addCell(cell);
 
                 /***/
                 cell = new PdfPCell(new Phrase(" ", BLACK_BOLD_TITULOS));
                 cell.setBorder(Rectangle.LEFT | Rectangle.BOTTOM);
                 //subTable3.addCell(createCellA("Cliente:"));
-                cell.setPaddingTop(40);
-                cell.setPaddingBottom(100);
+                cell.setPaddingTop(90);
+                cell.setPaddingBottom(90);
                 subTable3.addCell(cell);
 
                 cell = new PdfPCell(new Phrase(" ", BLACK_BOLD));
                 cell.setColspan(2);
                 cell.setBorder(Rectangle.RIGHT | Rectangle.BOTTOM);
-                cell.setPaddingTop(40);
-                cell.setPaddingBottom(100);
+                cell.setPaddingTop(90);
+                cell.setPaddingBottom(90);
                 subTable3.addCell(cell);
 
                 document.add(subTable3);
@@ -290,8 +298,19 @@ public class TicketDoc {
                 ByteArrayOutputStream stream3 = new ByteArrayOutputStream();
                 bitmapqr.compress(Bitmap.CompressFormat.PNG, 100, stream3);
                 Image imageQr = Image.getInstance(stream3.toByteArray());
-                imageQr.setAbsolutePosition(650, 20);
+                imageQr.setAbsolutePosition(350, 80);
+/*
+                subTable3 = new PdfPTable(2);
+                subTable3.setWidthPercentage(anchopagina);
+                cell = new PdfPCell(imageQr, true);
+                cell.setBorder(Rectangle.LEFT);
+                //cell.setPaddingBottom(5);
+                //subTable3.addCell(createCellA("Comuna:"));
+                subTable3.addCell(cell);
+*/
+
                 document.add(imageQr);
+                //document.add(subTable3);
 
                 if(fragil) {
                     //LOGO FRAGIL
@@ -301,14 +320,13 @@ public class TicketDoc {
                     bitDwLogo2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
                     Image imageLogo2 = Image.getInstance(stream2.toByteArray());
                     /**POSICION IMAGEN*/
-                    imageLogo2.setAbsolutePosition(350, 20);
+                    imageLogo2.setAbsolutePosition(150, 80);
                     /**TAMAÑO IMAGEN*/
                     imageLogo2.scaleAbsolute(145f, 145f);
                     document.add(imageLogo2);
                 }
 
                 //document.newPage();
-
         } catch(Exception e) {
             Log.e("titulo_documento",e.toString());
         }

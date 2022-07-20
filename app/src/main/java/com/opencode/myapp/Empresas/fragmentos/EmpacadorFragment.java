@@ -78,6 +78,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -465,10 +466,10 @@ public class EmpacadorFragment extends Fragment {
                                     0,
                                     String.valueOf(registro), //id detalle
                                     tipopedido, // id pedido
-                                    comuna,//comuna
-                                    condominio,//condominio
-                                    nomCliente, //nombre cliente
-                                    direccion); //direccion
+                                    comuna.toUpperCase(Locale.ROOT),//comuna
+                                    condominio == null ? "" : condominio.toUpperCase(Locale.ROOT),//condominio
+                                    nomCliente.toUpperCase(Locale.ROOT), //nombre cliente
+                                    direccion.toUpperCase(Locale.ROOT)); //direccion
                             String file_path = ticketDoc.getPathFile();
                             pdfFile = new File(file_path);
                             progressDialog.setMessage("Imprimiendo..");
@@ -482,7 +483,7 @@ public class EmpacadorFragment extends Fragment {
                                         //
                                         for (Bitmap bmp : list_bitmap) {
                                             zplPrinterHelper.start();
-                                            zplPrinterHelper.printBitmap("60", "60", bmp);
+                                            zplPrinterHelper.printBitmap("50", "50", bmp);
                                             zplPrinterHelper.end();
                                         }
                                         progressDialog.dismiss();
