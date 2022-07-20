@@ -97,7 +97,7 @@ public class TicketDoc {
         pdfFile = new File (folder, nomDoc);
         pathFile = pdfFile.getPath();
         try{
-            document = new Document(new Rectangle(700,  700), 5, 5, 5, 5);
+            document = new Document(new Rectangle(700,  700), 5, 5, 5, 15);
             pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
             paragraphBorder = new ParagraphBorder();
             pdfWriter.setPageEvent(paragraphBorder);
@@ -136,7 +136,7 @@ public class TicketDoc {
 
             document.close();
 
-        }catch (Exception e){
+        } catch (Exception e){
             Log.e("openDocument",e.toString());
         }
     }
@@ -303,7 +303,7 @@ public class TicketDoc {
                 ByteArrayOutputStream stream3 = new ByteArrayOutputStream();
                 bitmapqr.compress(Bitmap.CompressFormat.PNG, 100, stream3);
                 Image imageQr = Image.getInstance(stream3.toByteArray());
-                imageQr.setAbsolutePosition(350, 80);
+                imageQr.setAbsolutePosition(350, 100);
 /*
                 subTable3 = new PdfPTable(2);
                 subTable3.setWidthPercentage(anchopagina);
@@ -313,7 +313,6 @@ public class TicketDoc {
                 //subTable3.addCell(createCellA("Comuna:"));
                 subTable3.addCell(cell);
 */
-
                 document.add(imageQr);
                 //document.add(subTable3);
 
@@ -325,7 +324,7 @@ public class TicketDoc {
                     bitDwLogo2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
                     Image imageLogo2 = Image.getInstance(stream2.toByteArray());
                     /**POSICION IMAGEN*/
-                    imageLogo2.setAbsolutePosition(150, 80);
+                    imageLogo2.setAbsolutePosition(150, 100);
                     /**TAMAÑO IMAGEN*/
                     imageLogo2.scaleAbsolute(145f, 145f);
                     document.add(imageLogo2);

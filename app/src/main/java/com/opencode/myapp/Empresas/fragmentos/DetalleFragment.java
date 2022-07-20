@@ -568,7 +568,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             File pdfFile = null;
                             ticketDoc.openDocument(
                                     "",
-                                    "",
+                                    "codigouid",
                                     "",
                                     fragil,
                                     cajas,

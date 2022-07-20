@@ -110,7 +110,7 @@ public class TicketEmpaqRestaurantDoc {
         pdfFile = new File (folder, nomDoc);
         pathFile = pdfFile.getPath();
         try{
-            document = new Document(new Rectangle(700,  700), 1, 1, 1, 1);
+            document = new Document(new Rectangle(700,  700), 5, 5, 5, 15);
             pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
             paragraphBorder = new ParagraphBorder();
             pdfWriter.setPageEvent(paragraphBorder);
@@ -281,6 +281,7 @@ public class TicketEmpaqRestaurantDoc {
                 //***/
                 //subTable3.addCell(createCellA("Comuna:"));
                 cell = new PdfPCell(new Phrase("FECHA ELABORACIÓN", MID_BLACK_BOLD));
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 cell.setPaddingLeft(20);
                 cell.setPaddingTop(5);
                 cell.setColspan(3);
@@ -310,12 +311,12 @@ public class TicketEmpaqRestaurantDoc {
                 ByteArrayOutputStream stream1 = new ByteArrayOutputStream();
                 bitmapqr.compress(Bitmap.CompressFormat.PNG, 100, stream1);
                 Image imageQr = Image.getInstance(stream1.toByteArray());
-                imageQr.setAbsolutePosition(600, 140);
+                imageQr.setAbsolutePosition(500, 150);
                 imageQr.scaleAbsolute(140f, 140f);
                 document.add(imageQr);
                 //cell = new PdfPCell(imageQr, true);
                 cell = new PdfPCell(new Phrase(" ", BLACK_BOLD));
-                cell.setPaddingTop(20);
+                cell.setPaddingTop(60);
                 cell.setPaddingBottom(90);
                 cell.setColspan(8);
                 subTable3.addCell(cell);
@@ -329,7 +330,7 @@ public class TicketEmpaqRestaurantDoc {
                     bitDwLogo2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
                     Image imageLogo2 = Image.getInstance(stream2.toByteArray());
                     /**POSICION IMAGEN*/
-                    imageLogo2.setAbsolutePosition(300, 135);
+                    imageLogo2.setAbsolutePosition(250, 150);
                     /**TAMAÑO IMAGEN*/
                     imageLogo2.scaleAbsolute(100f, 100f);
                     document.add(imageLogo2);
