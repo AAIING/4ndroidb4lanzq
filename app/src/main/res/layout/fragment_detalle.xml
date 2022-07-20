@@ -65,13 +65,13 @@
                 android:textStyle="bold"></Chronometer>
 
             <TextView
-                android:padding="1dp"
                 android:id="@+id/view_det_pausar_pedido"
-                android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
-                android:layout_marginEnd="50dp"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_baseline_pause_circle_24" />
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="50dp"
+                android:drawableStart="@drawable/ic_baseline_pause_circle_24"
+                android:padding="1dp" />
 
             <TextView
                 android:id="@+id/view_det_menu"
@@ -85,6 +85,7 @@
                 android:textStyle="bold" />
 
         </RelativeLayout>
+
     </androidx.appcompat.widget.Toolbar>
 
     <TableLayout

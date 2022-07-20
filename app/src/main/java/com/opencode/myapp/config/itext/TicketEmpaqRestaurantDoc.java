@@ -47,10 +47,10 @@ public class TicketEmpaqRestaurantDoc {
     private File pdfFile;
     private Document document;
     private PdfWriter pdfWriter;
-    private Font BLACK_BOLD = new Font(Font.FontFamily.HELVETICA,48, Font.BOLD, BaseColor.BLACK);
-    private Font TINY_BLACK_BOLD = new Font(Font.FontFamily.HELVETICA,18, Font.BOLD, BaseColor.BLACK);
-    private Font MID_BLACK_BOLD = new Font(Font.FontFamily.HELVETICA,24, Font.BOLD, BaseColor.BLACK);
-    private Font BLACK_BOLD_TITULOS = new Font(Font.FontFamily.HELVETICA,44, Font.BOLD, BaseColor.BLACK);
+    private Font BLACK_BOLD = new Font(Font.FontFamily.HELVETICA,38, Font.BOLD, BaseColor.BLACK);
+    private Font TINY_BLACK_BOLD = new Font(Font.FontFamily.HELVETICA,14, Font.BOLD, BaseColor.BLACK);
+    private Font MID_BLACK_BOLD = new Font(Font.FontFamily.HELVETICA,22, Font.BOLD, BaseColor.BLACK);
+    private Font BLACK_BOLD_TITULOS = new Font(Font.FontFamily.HELVETICA,28, Font.BOLD, BaseColor.BLACK);
     private ParagraphBorder paragraphBorder;
     private String pathFile, npedido="",tpedido="",comuna="",nomcliente="",direccion="",
             condominio="", tiempoIngreso="", registro="", fechaelab="", categcliente="";
@@ -110,7 +110,7 @@ public class TicketEmpaqRestaurantDoc {
         pdfFile = new File (folder, nomDoc);
         pathFile = pdfFile.getPath();
         try{
-            document = new Document(new Rectangle(850,  650), 1, 1, 1, 1);
+            document = new Document(new Rectangle(700,  700), 1, 1, 1, 1);
             pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
             paragraphBorder = new ParagraphBorder();
             pdfWriter.setPageEvent(paragraphBorder);
