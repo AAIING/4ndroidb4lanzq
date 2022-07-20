@@ -104,15 +104,17 @@ public class TicketDoc {
             document.open();
             //CODIGO UUID PARA TICKET INGRESO PRIMERO IMPRIME, AL CERRAR PEDIDO SE ENVIA CODIGO DE TICKET INGRESO
             if(uidentrada.isEmpty()) {
+                /*
                 Itemsid itemsid = new Itemsid();
                 itemsid.setCodigo(codigouid);
                 itemsid.setTipoitem("CAJA");
                 itemsid.setPedidosregistro(Integer.parseInt(npedido));
                 listItems.add(itemsid);
+                */
             }else{
                 //TICKET INGRESO SOLO PARA IMPRIMIR
                 for (int i = 1; i == 1; i++) {
-                    docContent(i,cajas, 2);
+                    docContent(i,cajas, 0);
                     document.newPage();
                 }
             }
@@ -183,12 +185,15 @@ public class TicketDoc {
                 subTable3.addCell(createCellA("Pedido:"));
                 subTable3.addCell(createCellA(tpedido));
 
-                if(tipocajobol > 1) {
+                if(tipocajobol == 2) {
                     subTable3.addCell(createCellA("Caja:"));
                     subTable3.addCell(createCellA(index + "/" + totalcajobol));
-                } else {
+                } else if(tipocajobol == 1) {
                     subTable3.addCell(createCellA("Bolsa:"));
                     subTable3.addCell(createCellA(index + "/" + totalcajobol));
+                } else if(tipocajobol == 0) {
+                    subTable3.addCell(createCellA("Caja:"));
+                    subTable3.addCell(createCellA("1/1"));
                 }
 
                 cell.addElement(subTable3);
@@ -271,23 +276,23 @@ public class TicketDoc {
                 String shortuid = UUID.randomUUID().toString().replace("-","").substring(0,8);
                 Itemsid itemsid = new Itemsid();
 
-                if(tipocajobol > 1) {
+                if(tipocajobol == 2) {
                     //subTable3.addCell(createCellA("Caja:"));
                     //subTable3.addCell(createCellA(index + "/" + totalcajobol));
                     itemsid.setCodigo(shortuid);
                     itemsid.setTipoitem("CAJA");
                     itemsid.setPedidosregistro(Integer.parseInt(npedido));
-                } else {
+                    listItems.add(itemsid);
+                } else if(tipocajobol == 1){
                     itemsid.setCodigo(shortuid);
                     itemsid.setTipoitem("BOLSA");
                     itemsid.setPedidosregistro(Integer.parseInt(npedido));
+                    listItems.add(itemsid);
                     //subTable3.addCell(createCellA("Bolsa:"));
                     //subTable3.addCell(createCellA(index + "/" + totalcajobol));
                 }
 
-                listItems.add(itemsid);
                 Bitmap bitmapqr = null;
-
                 //SI CODIGOUID = VACIO.. VIENE CON UID ENTRADA PARA SOLO IMPRIMIR QR
                 if(codigouid.isEmpty()) {
                     bitmapqr = createBitmap(uidentrada);

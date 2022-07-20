@@ -250,7 +250,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
         viewColTara = view.findViewById(R.id.view_col_tara);
         viewColPsjeTotal = view.findViewById(R.id.view_col_psje_total);
         viewColPesaje = view.findViewById(R.id.view_col_pesaje);
-        //**/ 0 = EMPAQUE, 1 = EMPAQE RESTAURANT
+        //**/ 0=EMPAQUE, 1=EMPAQE RESTAURANT
         if(sessionDatos.getRecord().get(SessionKeys.empaqueRestaurant).equals("0")){
             empaqRest = "0";
             viewColTara.setVisibility(View.GONE);
@@ -333,7 +333,9 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             //editCajas.setTextColor(Color.BLACK);
             viewPausarPedido.setVisibility(View.GONE);
             timer.setVisibility(View.GONE);
+            viewMenu.setVisibility(View.GONE);
         }else{
+
             editCajas.setHint("0");
             cajas =1;
         }
@@ -559,57 +561,28 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             if (!editBolsas.getText().toString().isEmpty()) {
                                 bolsas = Integer.parseInt(editBolsas.getText().toString());
                             }
-
                             if (bolsas == 0 && cajas == 1) {
                                 alertRango("Empaque", "Debe especificar al menos una (1) Bolsa o Caja.");
                                 return false;
                             }
-
                             File pdfFile = null;
-                            if(sessionDatos.getRecord().get(SessionKeys.empaqueRestaurant).equals("1")){
-
-                                Long date=System.currentTimeMillis();
-                                SimpleDateFormat dateFormat =new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-                                String dateStr = dateFormat.format(date);
-
-                                ticketEmpaqRestaurantDoc.openDocument(
-                                        r9, //CATEG.CLIENTE
-                                        dateStr,
-                                        pesototalneto,
-                                        listDetalle,
-                                        fragil,
-                                        cajas,
-                                        bolsas,
-                                        String.valueOf(registro), //id detalle
-                                        r4, // id pedido
-                                        r7,//comuna
-                                        r10,//condominio
-                                        r2, //nombre cliente
-                                        r8); //direccion
-                                //listItems =
-                                String url_path2 = ticketEmpaqRestaurantDoc.getPathFile();
-                                pdfFile = new File(url_path2);
-                                listItems = ticketEmpaqRestaurantDoc.getListItems();
-                            }else {
-                                ticketDoc.openDocument(
-                                        "",
-                                        "codigouid",
-                                        "",
-                                        fragil,
-                                        cajas,
-                                        bolsas,
-                                        r1, //id detalle
-                                        r4, // id pedido
-                                        r7.toUpperCase(Locale.ROOT),//comuna
-                                        r10.toUpperCase(Locale.ROOT),//condominio
-                                        r2.toUpperCase(Locale.ROOT), //nombre cliente
-                                        r8.toUpperCase(Locale.ROOT)); //direccion
-                                String url_path2 = ticketDoc.getPathFile();
-                                pdfFile = new File(url_path2);
-
-                                //listItems.addAll(ticketDoc.getListItems());
-                                listItems = ticketDoc.getListItems();
-                            }
+                            ticketDoc.openDocument(
+                                    "",
+                                    "",
+                                    "",
+                                    fragil,
+                                    cajas,
+                                    bolsas,
+                                    r1, //id detalle
+                                    r4, // id pedido
+                                    r7.toUpperCase(Locale.ROOT),//comuna
+                                    r10.toUpperCase(Locale.ROOT),//condominio
+                                    r2.toUpperCase(Locale.ROOT), //nombre cliente
+                                    r8.toUpperCase(Locale.ROOT)); //direccion
+                            String url_path2 = ticketDoc.getPathFile();
+                            pdfFile = new File(url_path2);
+                            listItems = ticketDoc.getListItems();
+                            //
                             progressDialog.setMessage("Imprimiendo..");
                             progressDialog.show();
                             List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
@@ -631,11 +604,9 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             }.start();
                             Toast.makeText(getContext(), "Ticket Generado", Toast.LENGTH_LONG).show();
                             listItems = ticketDoc.getListItems();
-                            //
                             editCajas.setText("");
                             editBolsas.setText("");
                           return true;
-
                         case R.id.item_gen_com_etq:
                             /*
                             bolsas = 0;
@@ -681,7 +652,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
     private View.OnClickListener onClickGuardarDet = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //
             DecimalFormat fd = new DecimalFormat("###,###.##");
             if(!sessionDatos.getRecord().get(SessionKeys.empaqueRestaurant).equals("1")){
                 /**VERIFICAR RANGOS DE PESO CORRECTOS*/
@@ -718,6 +688,26 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
             if(!editBolsas.getText().toString().isEmpty()){
                 bolsas = Integer.parseInt(editBolsas.getText().toString());
             }
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.setTitle("Cerrar Pedido");
+            alertDialog.setMessage("¿Esta seguro de cerrar pedido?");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Aceptar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    /***/
+                    cierraPedido();
+                    alertDialog.dismiss();
+                }
+            });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Volver", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    alertDialog.dismiss();
+                }
+            });
+            alertDialog.show();
+
+            /*
             if(bolsas == 0){
                 alertDialog.setCanceledOnTouchOutside(false);
                 alertDialog.setTitle("Sin Bolsas");
@@ -738,25 +728,9 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 alertDialog.show();
                 //
             }else{
-                alertDialog.setCanceledOnTouchOutside(false);
-                alertDialog.setTitle("Cerrar Pedido");
-                alertDialog.setMessage("¿Esta seguro de cerrar pedido?");
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Aceptar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        /***/
-                        cierraPedido();
-                        alertDialog.dismiss();
-                    }
-                });
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Volver", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        alertDialog.dismiss();
-                    }
-                });
-                alertDialog.show();
+
             }
+            */
         }
     };
 
@@ -994,6 +968,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                double pesototalneto,
                                int estado,
                                int pedidopausa){
+
         Map<String, Object> jsonArrayMap = new ArrayMap<>();
         jsonArrayMap.put("Cajas", cajas);
         jsonArrayMap.put("Bolsas", bolsas);
@@ -1032,8 +1007,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     }
                     progressDialog.dismiss();
 
-                  /*
-				  File pdfFile = null;
+                    File pdfFile = null;
                     if(sessionDatos.getRecord().get(SessionKeys.empaqueRestaurant).equals("1")){
                         ticketEmpaqRestaurantDoc.openDocument(
                                 r9, //CATEG.CLIENTE
@@ -1049,14 +1023,19 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                 r10,//condominio
                                 r2, //nombre cliente
                                 r8); //direccion
-                            //listItems =
-                            String url_path2 = ticketEmpaqRestaurantDoc.getPathFile();
-                            pdfFile = new File(url_path2);
-                            listItems = ticketEmpaqRestaurantDoc.getListItems();
-                        }
-                        else
-                        {
-
+                        //listItems =
+                        String url_path2 = ticketEmpaqRestaurantDoc.getPathFile();
+                        pdfFile = new File(url_path2);
+                        listItems = ticketEmpaqRestaurantDoc.getListItems();
+                    }
+                    else
+                    {
+                        Itemsid itemsid = new Itemsid();
+                        itemsid.setCodigo(coduid);
+                        itemsid.setTipoitem("CAJA");
+                        itemsid.setPedidosregistro(Integer.parseInt(r1));
+                        listItems.add(itemsid);
+                            /*
                             if(cajas > 1 || bolsas > 0) {
                                 ticketDoc.openDocument(
                                         "",
@@ -1076,36 +1055,30 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                 listItems = ticketDoc.getListItems();
                                 //
                             }else{
-                                Itemsid itemsid = new Itemsid();
-                                itemsid.setCodigo(coduid);
-                                itemsid.setTipoitem("CAJA");
-                                itemsid.setPedidosregistro(Integer.parseInt(r1));
-                                listItems.add(itemsid);
                             }
-
-                        }
-
-                        progressDialog.setMessage("Imprimiendo..");
-                        progressDialog.show();
-                        List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                //do in background
-                                try {
-                                    //
-                                    for (Bitmap bmp : list_bitmap) {
-                                        zplPrinterHelper.start();
-                                        zplPrinterHelper.printBitmap("50", "50", bmp);
-                                        zplPrinterHelper.end();
-                                    }
-                                    progressDialog.dismiss();
-                                } catch (Exception e) {
-                                    progressDialog.dismiss();
+                            */
+                    }
+                    progressDialog.setMessage("Imprimiendo..");
+                    progressDialog.show();
+                    List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //do in background
+                            try {
+                                //
+                                for (Bitmap bmp : list_bitmap) {
+                                    zplPrinterHelper.start();
+                                    zplPrinterHelper.printBitmap("50", "50", bmp);
+                                    zplPrinterHelper.end();
                                 }
+                                progressDialog.dismiss();
+                            } catch (Exception e) {
+                                progressDialog.dismiss();
                             }
-                        }).start();
-                        */
+                        }
+                    }).start();
+
                     //POST ITEMS
                     for(Itemsid itemid: listItems){
                         postItemPedido(itemid.getPedidosregistro(),
@@ -1167,6 +1140,8 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 Toast.makeText(getContext(), "ERROR..", Toast.LENGTH_LONG).show();
             }
         });
+
+
     }
 
     //**UPDATE PEDIDOS DETALLE*/
