@@ -475,23 +475,29 @@ public class EmpacadorFragment extends Fragment {
                             progressDialog.setMessage("Imprimiendo..");
                             progressDialog.show();
                             List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //do in background
-                                    try {
-                                        //
-                                        for (Bitmap bmp : list_bitmap) {
-                                            zplPrinterHelper.start();
-                                            zplPrinterHelper.printBitmap("50", "50", bmp);
-                                            zplPrinterHelper.end();
+
+                            //EL FOR DEL BITMAP DEBERIA PROBARSE ACÁ
+                            //for (Bitmap bmp : list_bitmap) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //do in background
+                                        try {
+                                            //
+                                            for (Bitmap bmp : list_bitmap) {
+                                                zplPrinterHelper.start();
+                                                zplPrinterHelper.printBitmap("100", "100", bmp);
+                                                zplPrinterHelper.end();
+                                            }
+                                            progressDialog.dismiss();
+                                        } catch (Exception e) {
+                                            progressDialog.dismiss();
                                         }
-                                        progressDialog.dismiss();
-                                    } catch (Exception e) {
-                                        progressDialog.dismiss();
                                     }
-                                }
-                            }).start();
+                                }).start();
+
+                          //  }
+
                             Toast.makeText(getContext(), "Ticket Ingreso N°Pedido " + String.valueOf(registro) + " Generado..", Toast.LENGTH_LONG).show();
                         }
                     }
@@ -543,7 +549,7 @@ public class EmpacadorFragment extends Fragment {
                 canvas.drawColor(Color.WHITE);
                 canvas.drawBitmap(bitmap, 0, 0, null);
                 page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                bitmaps.add(getResizedBitmap(bitmap, 750, 750));
+                bitmaps.add(getResizedBitmap(bitmap, 700, 700));
                 // close the page
                 page.close();
             }

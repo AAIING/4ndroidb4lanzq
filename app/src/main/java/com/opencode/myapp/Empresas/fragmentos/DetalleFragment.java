@@ -582,7 +582,6 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                             String url_path2 = ticketDoc.getPathFile();
                             pdfFile = new File(url_path2);
                             listItems = ticketDoc.getListItems();
-                            //
                             progressDialog.setMessage("Imprimiendo..");
                             progressDialog.show();
                             List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
@@ -592,16 +591,24 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                                     super.run();
                                     try{
                                         for(Bitmap bmp: list_bitmap) {
+
+                                            Thread.sleep(2000);
+
                                             zplPrinterHelper.start();
-                                            zplPrinterHelper.printBitmap("50", "50", bmp);
+                                            zplPrinterHelper.printBitmap("100", "100", bmp);
                                             zplPrinterHelper.end();
+
+                                            //Log.e("BITMAP-->", "OK");
                                         }
                                         progressDialog.dismiss();
                                     }catch (Exception e){
                                         progressDialog.dismiss();
                                     }
+
+                                    //Log.e("TREAD-->", "OK");
                                 }
                             }.start();
+
                             Toast.makeText(getContext(), "Ticket Generado", Toast.LENGTH_LONG).show();
                             listItems = ticketDoc.getListItems();
                             editCajas.setText("");
@@ -1061,24 +1068,34 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                     progressDialog.setMessage("Imprimiendo..");
                     progressDialog.show();
                     List<Bitmap> list_bitmap = pdfToBitmap(pdfFile);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //do in background
-                            try {
-                                //
-                                for (Bitmap bmp : list_bitmap) {
-                                    zplPrinterHelper.start();
-                                    zplPrinterHelper.printBitmap("50", "50", bmp);
-                                    zplPrinterHelper.end();
-                                }
-                                progressDialog.dismiss();
-                            } catch (Exception e) {
-                                progressDialog.dismiss();
-                            }
-                        }
-                    }).start();
 
+                    //for (Bitmap bmp : list_bitmap) {
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //do in background
+                                try {
+                                    //
+                                    for (Bitmap bmp : list_bitmap) {
+                                        zplPrinterHelper.start();
+                                        zplPrinterHelper.printBitmap("100", "100", bmp);
+                                        zplPrinterHelper.end();
+
+                                        //Log.e("BITMAP-->", "OK");
+                                    }
+
+                                } catch (Exception e) {
+                                    progressDialog.dismiss();
+                                }
+
+                                //Log.e("TREAD-->", "OK");
+                            }
+                        }).start();
+
+                    //}
+
+                    progressDialog.dismiss();
                     //POST ITEMS
                     for(Itemsid itemid: listItems){
                         postItemPedido(itemid.getPedidosregistro(),
@@ -1338,6 +1355,11 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 if (response.isSuccessful()) {
                     List<Pedidosd> result = response.body();
                     listDetalle.addAll(result);
+                    if(sessionDatos.getRecord().get(SessionKeys.empaqueRestaurant).equals("1")){
+                       editCajas.setText(""+listDetalle.size());
+                       editCajas.setEnabled(false);
+                       editCajas.setTextColor(Color.BLACK);
+                    }
                     loadListDetalle();
                 }
             }
@@ -1363,7 +1385,7 @@ public class DetalleFragment extends Fragment implements FProduccion_Buscar_Pesa
                 canvas.drawColor(Color.WHITE);
                 canvas.drawBitmap(bitmap, 0, 0, null);
                 page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                bitmaps.add(getResizedBitmap(bitmap, 750, 750));
+                bitmaps.add(getResizedBitmap(bitmap, 700, 700));
                 // close the page
                 page.close();
             }
